@@ -1,17 +1,17 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'AppFinder - Best Free Software & Open Source Desktop Apps Directory',
-  description: 'Search thousands of verified open-source tools, free desktop applications, and productivity software with direct links to official download pages. Zero malware, zero adware.',
-  keywords: ['free software', 'open source apps', 'desktop software', 'windows apps', 'mac software', 'linux apps', 'getintopc', 'free pc apps'],
-  authors: [{ name: 'AppFinder Team' }],
+  title: 'Pro App Finder - Free APKs, Mods & Premium App Downloads',
+  description: 'Find the latest free pro apps, unlocked APKs, modded apps, and direct download links for Android, iOS, Windows, macOS, and Linux. Search top apps like TikTok Live, Wink Video Retouch, Alight Motion, Remini, Lightroom Pro, Truecaller Gold, and Filmora Pro.',
+  keywords: ['pro apk', 'free pro apps', 'mod apk', 'apk download', 'apk mirror', 'android apk', 'app finder', 'premium app download', 'apk mods', 'free app store', 'TikTok Live', 'Wink Video Retouch', 'Alight Motion', 'Remini', 'Lightroom Pro', 'Truecaller Gold', 'Filmora Pro'],
+  authors: [{ name: 'Pro App Finder' }],
   icons: {
     icon: '/favicon.svg',
   },
   openGraph: {
-    title: 'AppFinder - Safe & Official Free Software Directory',
-    description: 'Discover top free & open-source desktop apps for Windows, macOS, Linux, Android, and iOS.',
-    siteName: 'AppFinder',
+    title: 'Pro App Finder - Free APKs, Mods & Premium App Downloads',
+    description: 'Browse unlocked APKs, premium app mods, and free pro software with direct download links and app recommendations.',
+    siteName: 'Pro App Finder',
     type: 'website',
   },
 };
