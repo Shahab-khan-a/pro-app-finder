@@ -20,7 +20,7 @@ export default function AboutView() {
     {
       icon: Lock,
       title: 'Zero Adware & Malware Policy',
-      description: 'Say goodbye to bundled toolbars, browser hijackers, and bloatware. AppFinder strictly filters out predatory software distributions.',
+      description: 'Say goodbye to bundled toolbars, browser hijackers, and bloatware. AppScout strictly filters out predatory software distributions.',
       color: 'text-indigo-500 bg-indigo-500/10'
     },
     {
@@ -42,11 +42,11 @@ export default function AboutView() {
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-          Why We Built <span className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">AppFinder</span>
+          Why We Built <span className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">AppScout</span>
         </h1>
 
         <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-          Searching for free software on the web shouldn't mean navigating through deceptive download buttons, malware-infested mirrors, or hidden trial subscriptions. AppFinder provides a clean, safe, index of official free & open-source desktop and mobile software.
+          Searching for free software on the web shouldn't mean navigating through deceptive download buttons, malware-infested mirrors, or hidden trial subscriptions. AppScout provides a clean, safe, index of official free & open-source desktop and mobile software.
         </p>
       </div>
 
@@ -83,7 +83,7 @@ export default function AboutView() {
             Made for Creators, Developers, & Daily Users
           </h2>
           <p className="mt-3 text-xs sm:text-sm text-blue-100 leading-relaxed font-normal">
-            AppFinder is built with ❤️ to empower digital freedom. Have an open-source tool or free app you love? Submit it to our registry and help millions discover great software.
+            AppScout is built with ❤️ to empower digital freedom. Have an open-source tool or free app you love? Submit it to our registry and help millions discover great software.
           </p>
         </div>
       </div>

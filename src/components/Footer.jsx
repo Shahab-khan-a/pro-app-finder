@@ -25,7 +25,7 @@ export default function Footer({ setActiveTab, onOpenSubmitModal }) {
                 <Download className="w-5 h-5" />
               </div>
               <span className="font-extrabold text-xl bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                AppFinder
+                AppScout
               </span>
             </div>
 
@@ -115,7 +115,7 @@ export default function Footer({ setActiveTab, onOpenSubmitModal }) {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-6 border-t border-slate-200/60 dark:border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© {new Date().getFullYear()} AppFinder. All rights reserved. Free software directory for Windows, Mac, Linux, Android, & iOS.</p>
+          <p>© {new Date().getFullYear()} AppScout. All rights reserved. Free software directory for Windows, Mac, Linux, Android, & iOS.</p>
           <p className="flex items-center gap-1 font-medium">
             <span>Built with</span>
             <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 inline" />

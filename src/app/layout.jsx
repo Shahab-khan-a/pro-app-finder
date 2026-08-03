@@ -1,17 +1,17 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Pro App Finder - Free APKs, Mods & Premium App Downloads',
+  title: 'AppScout - Free APKs, Mods & Premium App Downloads',
   description: 'Find the latest free pro apps, unlocked APKs, modded apps, and direct download links for Android, iOS, Windows, macOS, and Linux. Search top apps like TikTok Live, Wink Video Retouch, Alight Motion, Remini, Lightroom Pro, Truecaller Gold, and Filmora Pro.',
-  keywords: ['pro apk', 'free pro apps', 'mod apk', 'apk download', 'apk mirror', 'android apk', 'app finder', 'premium app download', 'apk mods', 'free app store', 'TikTok Live', 'Wink Video Retouch', 'Alight Motion', 'Remini', 'Lightroom Pro', 'Truecaller Gold', 'Filmora Pro'],
-  authors: [{ name: 'Pro App Finder' }],
+  keywords: ['pro apk', 'free pro apps', 'mod apk', 'apk download', 'apk mirror', 'android apk', 'app scout', 'premium app download', 'apk mods', 'free app store', 'TikTok Live', 'Wink Video Retouch', 'Alight Motion', 'Remini', 'Lightroom Pro', 'Truecaller Gold', 'Filmora Pro'],
+  authors: [{ name: 'AppScout' }],
   icons: {
     icon: '/favicon.svg',
   },
   openGraph: {
-    title: 'Pro App Finder - Free APKs, Mods & Premium App Downloads',
+    title: 'AppScout - Free APKs, Mods & Premium App Downloads',
     description: 'Browse unlocked APKs, premium app mods, and free pro software with direct download links and app recommendations.',
-    siteName: 'Pro App Finder',
+    siteName: 'AppScout',
     type: 'website',
   },
 };
