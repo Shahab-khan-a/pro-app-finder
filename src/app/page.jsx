@@ -5,7 +5,7 @@ import AppShell from '@/components/AppShell';
 import HeroSection from '@/components/HeroSection';
 import AppCard from '@/components/AppCard';
 import AppIconGridCard from '@/components/AppIconGridCard';
-import { APPS_DATA, CATEGORIES } from '@/data/appsData';
+import { APPS_DATA, CATEGORIES, getAppDomain } from '@/data/appsData';
 import { Search, LayoutGrid, Columns3 } from 'lucide-react';
 
 function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitModalOpen, setIsSubmitModalOpen }) {
@@ -22,19 +22,42 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
     window.scrollTo({ top: 350, behavior: 'smooth' });
   };
 
+  // Helper to normalize search query terms & handle typos/synonyms
+  const normalizeQuery = (rawQuery) => {
+    let q = rawQuery.toLowerCase().trim();
+    // Common typos & synonyms
+    q = q.replace(/\bnev\b/g, 'new');
+    q = q.replace(/\bdesctop\b/g, 'desktop');
+    q = q.replace(/\bdekstop\b/g, 'desktop');
+    q = q.replace(/\bsoftwear\b/g, 'software');
+    q = q.replace(/\bsoflware\b/g, 'software');
+    return q;
+  };
+
   // Filter & Search Logic
   const filteredApps = useMemo(() => {
     return APPS_DATA.filter(app => {
       if (searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase();
-        const matchesName = app.name.toLowerCase().includes(query);
-        const matchesTagline = app.tagline.toLowerCase().includes(query);
-        const matchesDesc = app.description.toLowerCase().includes(query);
-        const matchesPublisher = app.publisher.toLowerCase().includes(query);
-        const matchesCategory = app.categoryName.toLowerCase().includes(query);
-        const matchesFeature = app.features.some(f => f.toLowerCase().includes(query));
+        const rawQuery = searchQuery.toLowerCase().trim();
+        const normalized = normalizeQuery(searchQuery);
 
-        if (!matchesName && !matchesTagline && !matchesDesc && !matchesPublisher && !matchesCategory && !matchesFeature) {
+        // Check exact match first
+        const matchesName = app.name.toLowerCase().includes(rawQuery) || app.name.toLowerCase().includes(normalized);
+        const matchesTagline = app.tagline.toLowerCase().includes(rawQuery) || app.tagline.toLowerCase().includes(normalized);
+        const matchesDesc = app.description.toLowerCase().includes(rawQuery) || app.description.toLowerCase().includes(normalized);
+        const matchesPublisher = app.publisher.toLowerCase().includes(rawQuery) || app.publisher.toLowerCase().includes(normalized);
+        const matchesCategory = app.categoryName.toLowerCase().includes(rawQuery) || app.categoryName.toLowerCase().includes(normalized);
+        const matchesFeature = app.features.some(f => f.toLowerCase().includes(rawQuery) || f.toLowerCase().includes(normalized));
+
+        // Desktop app search intent matching
+        const isDesktopQuery = normalized.includes('desktop') || rawQuery.includes('desktop') || rawQuery.includes('desctop') || rawQuery.includes('pc');
+        const matchesDesktop = isDesktopQuery && (app.platforms.includes('windows') || app.platforms.includes('mac') || app.platforms.includes('linux'));
+
+        // New app search intent matching
+        const isNewQuery = normalized.includes('new') || rawQuery.includes('nev');
+        const matchesNew = isNewQuery && (app.featured || app.popular || app.rating >= 4.7);
+
+        if (!matchesName && !matchesTagline && !matchesDesc && !matchesPublisher && !matchesCategory && !matchesFeature && !matchesDesktop && !matchesNew) {
           return false;
         }
       }
@@ -69,11 +92,16 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
     if (searchQuery.trim() !== '' && filteredApps.length === 0) {
       const query = searchQuery.trim();
       const cleanName = query.charAt(0).toUpperCase() + query.slice(1);
+      const appDomain = getAppDomain(cleanName);
       const domainName = cleanName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
       const isTikTok = query.toLowerCase().includes('tiktok');
       const isModQuery = query.toLowerCase().includes('mod') || query.toLowerCase().includes('apk') || query.toLowerCase().includes('pro');
       const targetUrl = isTikTok ? 'https://9mod.com/tiktok.html' : isModQuery ? `https://9mod.com/${domainName}.html` : null;
+
+      const fallbackIcon = isTikTok 
+        ? 'https://www.google.com/s2/favicons?domain=tiktok.com&sz=128' 
+        : `https://www.google.com/s2/favicons?domain=${appDomain}&sz=128`;
 
       return {
         id: `dynamic-${domainName}`,
@@ -82,13 +110,13 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
         description: isTikTok 
           ? 'TikTok Live lets creators broadcast live streams, interact with millions of viewers, and share short videos. Access direct free download mirror via 9mod.'
           : `${cleanName} is available for download. Find direct official website links and free PC & Android download mirrors for Windows, macOS, Linux, and mobile devices.`,
-        icon: isTikTok ? 'https://www.google.com/s2/favicons?domain=tiktok.com&sz=128' : `https://www.google.com/s2/favicons?domain=${domainName}.com&sz=128`,
+        icon: fallbackIcon,
         category: selectedCategory !== 'all' ? selectedCategory : 'utilities',
         categoryName: selectedCategory !== 'all' ? (CATEGORIES.find(c => c.id === selectedCategory)?.name || 'Utilities') : 'Utilities',
         licenseType: selectedLicense !== 'all' ? selectedLicense : '100% Free',
         licenseDetails: isModQuery ? 'Unlocked Pro / APK Mod Mirror' : 'Free Software / Official Distribution',
         platforms: ['android', 'windows', 'mac', 'linux', 'ios'],
-        officialWebsite: isTikTok ? 'https://www.tiktok.com/' : `https://www.google.com/search?q=${encodeURIComponent(cleanName + ' official site')}`,
+        officialWebsite: isTikTok ? 'https://www.tiktok.com/' : `https://${appDomain}`,
         downloadUrl: targetUrl || `https://www.google.com/search?q=${encodeURIComponent(cleanName + ' official download page')}`,
         mirrorUrl: targetUrl || `https://getintopc.com/?s=${encodeURIComponent(cleanName)}`,
         mirrorLabel: isTikTok ? '9mod Mirror' : isModQuery ? '9mod APK Mod' : undefined,
@@ -121,6 +149,8 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
         selectedLicense={selectedLicense}
         setSelectedLicense={setSelectedLicense}
         totalResultsCount={filteredApps.length}
+        onSelectApp={setSelectedApp}
+        onSelectCategory={setSelectedCategory}
       />
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

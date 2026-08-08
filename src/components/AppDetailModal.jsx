@@ -38,12 +38,15 @@ export default function AppDetailModal({
   });
 
   const getInitialIcon = () => {
-    if (app && app.icon && app.icon.trim() !== '') {
+    if (app && app.icon && !app.icon.includes('domain=desctopapp') && !app.icon.includes('domain=nevapp')) {
       return app.icon;
     }
     try {
-      const domain = new URL(app.officialWebsite).hostname;
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+      const hostname = new URL(app.officialWebsite).hostname;
+      if (hostname.includes('google.com') || hostname.includes('getintopc.com') || hostname.includes('9mod.com')) {
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(app ? app.name : 'App')}&background=2563eb&color=ffffff&bold=true&size=128`;
+      }
+      return `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
     } catch {
       return `https://ui-avatars.com/api/?name=${encodeURIComponent(app ? app.name : 'App')}&background=2563eb&color=ffffff&bold=true&size=128`;
     }
@@ -63,12 +66,14 @@ export default function AppDetailModal({
     if (errorStage === 0) {
       setErrorStage(1);
       try {
-        const domain = new URL(app.officialWebsite).hostname;
-        setImgSrc(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`);
-      } catch {
-        setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=2563eb&color=ffffff&bold=true&size=128`);
-      }
-    } else if (errorStage === 1) {
+        const hostname = new URL(app.officialWebsite).hostname;
+        if (!hostname.includes('google.com')) {
+          setImgSrc(`https://www.google.com/s2/favicons?domain=${hostname}&sz=128`);
+          return;
+        }
+      } catch {}
+      setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=2563eb&color=ffffff&bold=true&size=128`);
+    } else {
       setErrorStage(2);
       setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=2563eb&color=ffffff&bold=true&size=128`);
     }

@@ -33,7 +33,12 @@ export default function AppCard({
 
   const getDomainFromUrl = (url) => {
     try {
-      return new URL(url).hostname;
+      if (!url) return '';
+      const hostname = new URL(url).hostname;
+      if (hostname.includes('google.com') || hostname.includes('getintopc.com') || hostname.includes('9mod.com') || hostname.includes('bing.com')) {
+        return '';
+      }
+      return hostname;
     } catch {
       return '';
     }
@@ -42,9 +47,11 @@ export default function AppCard({
   const domain = getDomainFromUrl(app.officialWebsite);
 
   const getIconSrc = () => {
-    if (iconStage === 0 && app.icon) return app.icon;
+    if (iconStage === 0 && app.icon) {
+      return app.icon;
+    }
     if (iconStage <= 1 && domain) return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-    if (iconStage <= 2 && domain) return `https://unavatar.io/${domain}`;
+    if (iconStage <= 2) return `https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=2563eb&color=ffffff&bold=true&size=128`;
     return null;
   };
 
@@ -52,9 +59,9 @@ export default function AppCard({
 
   const renderAppIcon = () => {
     if (!currentIconSrc || iconStage >= 3) {
-      const initials = app.name ? app.name.substring(0, 2).toUpperCase() : 'AP';
+      const initials = app.name ? app.name.trim().substring(0, 2).toUpperCase() : 'AP';
       return (
-        <div className="w-full h-full rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-lg shadow-inner">
+        <div className="w-full h-full rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 flex items-center justify-center text-white font-black text-lg shadow-inner select-none">
           {initials}
         </div>
       );

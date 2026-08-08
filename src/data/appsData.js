@@ -22,6 +22,62 @@ export const PLATFORMS = [
   { id: 'ios', name: 'iOS', icon: 'Tablet' },
 ];
 
+export const getAppDomain = (appName) => {
+  if (!appName) return 'example.com';
+  const clean = appName.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+
+  const knownDomains = {
+    telegram: 'telegram.org',
+    zoom: 'zoom.us',
+    notion: 'notion.so',
+    obsidian: 'obsidian.md',
+    whatsapp: 'whatsapp.com',
+    discord: 'discord.com',
+    spotify: 'spotify.com',
+    figma: 'figma.com',
+    slack: 'slack.com',
+    steam: 'steampowered.com',
+    epicgames: 'epicgames.com',
+    roblox: 'roblox.com',
+    minecraft: 'minecraft.net',
+    capcut: 'capcut.com',
+    tiktok: 'tiktok.com',
+    photoshop: 'adobe.com',
+    illustrator: 'adobe.com',
+    premiere: 'adobe.com',
+    lightroom: 'adobe.com',
+    acrobat: 'adobe.com',
+    canva: 'canva.com',
+    blender: 'blender.org',
+    vlc: 'videolan.org',
+    brave: 'brave.com',
+    chrome: 'google.com',
+    firefox: 'mozilla.org',
+    edge: 'microsoft.com',
+    winrar: 'win-rar.com',
+    sevenzip: '7-zip.org',
+    postman: 'postman.com',
+    docker: 'docker.com',
+    github: 'github.com',
+    gitlab: 'gitlab.com',
+    sublime: 'sublimetext.com',
+    gimp: 'gimp.org',
+    inkscape: 'inkscape.org',
+    krita: 'krita.org',
+    audacity: 'audacityteam.org',
+    obs: 'obsproject.com',
+    handbrake: 'handbrake.fr',
+    bitwarden: 'bitwarden.com',
+    duolingo: 'duolingo.com'
+  };
+
+  for (const [key, domain] of Object.entries(knownDomains)) {
+    if (clean.includes(key)) return domain;
+  }
+
+  return `${clean}.com`;
+};
+
 export const LICENSE_TYPES = [
   { id: 'all', name: 'All Licenses' },
   { id: 'Open Source', name: 'Open Source' },
