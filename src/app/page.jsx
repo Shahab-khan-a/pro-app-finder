@@ -5,10 +5,11 @@ import AppShell from '@/components/AppShell';
 import HeroSection from '@/components/HeroSection';
 import AppCard from '@/components/AppCard';
 import AppIconGridCard from '@/components/AppIconGridCard';
+import TrendingLeaderboard from '@/components/TrendingLeaderboard';
 import { APPS_DATA, CATEGORIES, getAppDomain } from '@/data/appsData';
 import { Search, LayoutGrid, Columns3 } from 'lucide-react';
 
-function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitModalOpen, setIsSubmitModalOpen }) {
+function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitModalOpen, setIsSubmitModalOpen, setIsQuizModalOpen, setIsSurpriseModalOpen, setIsCompareModalOpen }) {
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -151,9 +152,14 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
         totalResultsCount={filteredApps.length}
         onSelectApp={setSelectedApp}
         onSelectCategory={setSelectedCategory}
+        onOpenQuizModal={() => setIsQuizModalOpen && setIsQuizModalOpen(true)}
+        onOpenSurpriseModal={() => setIsSurpriseModalOpen && setIsSurpriseModalOpen(true)}
+        onOpenCompareModal={() => setIsCompareModalOpen && setIsCompareModalOpen(true)}
       />
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <TrendingLeaderboard onSelectApp={setSelectedApp} />
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* Category Pills Bar */}
         <div className="relative mb-8">

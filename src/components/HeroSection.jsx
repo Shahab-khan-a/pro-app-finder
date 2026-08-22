@@ -14,9 +14,18 @@ import {
   Filter,
   ArrowRight,
   Folder,
-  AppWindow
+  AppWindow,
+  Dices,
+  Wand2,
+  Layers,
+  Video,
+  Code,
+  Shield,
+  Palette,
+  Swords
 } from 'lucide-react';
 import { APPS_DATA, CATEGORIES, PLATFORMS, LICENSE_TYPES, getAppDomain } from '@/data/appsData';
+import LiveActivityTicker from '@/components/LiveActivityTicker';
 
 export default function HeroSection({
   searchQuery,
@@ -27,7 +36,10 @@ export default function HeroSection({
   setSelectedLicense,
   totalResultsCount,
   onSelectApp,
-  onSelectCategory
+  onSelectCategory,
+  onOpenQuizModal,
+  onOpenSurpriseModal,
+  onOpenCompareModal
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -182,173 +194,208 @@ export default function HeroSection({
   };
 
   return (
-    <section className="relative overflow-hidden pt-8 pb-12 sm:pt-12 sm:pb-16 bg-gradient-to-b from-blue-50/50 via-slate-50/50 to-transparent dark:from-slate-900/50 dark:via-slate-950/50 dark:to-transparent border-b border-slate-200/60 dark:border-slate-800/60">
-      
-      {/* Decorative Glow Elements */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 dark:bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+    <>
+      <LiveActivityTicker />
+      <section className="relative overflow-hidden pt-8 pb-12 sm:pt-12 sm:pb-16 bg-gradient-to-b from-blue-50/50 via-slate-50/50 to-transparent dark:from-slate-900/50 dark:via-slate-950/50 dark:to-transparent border-b border-slate-200/60 dark:border-slate-800/60">
         
-        {/* Verified Security Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm font-semibold mb-6 animate-pulse-glow">
-          <ShieldCheck className="w-4 h-4 text-emerald-500" />
-          <span>100% Free & Open Source • Verified Official Download Links Only</span>
-        </div>
+        {/* Decorative Glow Elements */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 dark:bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Hero Heading */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-          Discover Best <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 dark:from-blue-400 dark:via-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">Free Software</span> & Desktop Apps
-        </h1>
-        
-        <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal">
-          Search thousands of open-source tools, free desktop applications, and productivity software with direct links to official download pages. Zero malware, zero adware.
-        </p>
-
-        {/* Main Search Bar & Suggestions Container */}
-        <div ref={searchContainerRef} className="mt-8 max-w-2xl mx-auto relative z-30">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 rounded-2xl blur-md opacity-25 group-hover:opacity-40 transition duration-300" />
-            
-            <div className="relative flex items-center bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-2 sm:p-2.5">
-              <Search className="w-6 h-6 text-slate-400 dark:text-slate-500 ml-3 shrink-0" />
-              
-              <input
-                type="text"
-                value={searchQuery}
-                onFocus={() => setIsOpen(true)}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setIsOpen(true);
-                  setSelectedIndex(-1);
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder="Search any app name (e.g. VS Code, Blender, VLC, Brave)..."
-                className="w-full pl-3 pr-4 py-2 sm:py-2.5 text-base sm:text-lg bg-transparent text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
-                autoFocus
-              />
-
-              {searchQuery && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setIsOpen(false);
-                  }}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 mr-1 cursor-pointer"
-                  title="Clear search"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
-
-              <button
-                onClick={() => setIsOpen(false)}
-                className="hidden sm:flex items-center gap-1.5 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-sm rounded-xl shadow-md transition duration-200 shrink-0 cursor-pointer"
-              >
-                <Search className="w-4 h-4" />
-                <span>Search</span>
-              </button>
-            </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          
+          {/* Verified Security Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm font-semibold mb-6 animate-pulse-glow">
+            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <span>100% Free & Open Source • Verified Official Download Links Only</span>
           </div>
 
-          {/* Interactive Live Search Suggestions Dropdown */}
-          {isOpen && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 text-left animate-in fade-in slide-in-from-top-2 duration-200">
+          {/* Hero Heading */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+            Discover Best <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 dark:from-blue-400 dark:via-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">Free Software</span> & Desktop Apps
+          </h1>
+          
+          <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal">
+            Search thousands of open-source tools, free desktop applications, and productivity software with direct links to official download pages. Zero malware, zero adware.
+          </p>
+
+          {/* Interactive Attraction Feature CTAs */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {onOpenQuizModal && (
+              <button
+                onClick={onOpenQuizModal}
+                className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <Wand2 className="w-4 h-4 text-amber-300 animate-bounce" />
+                <span>Find My Perfect App (AI Matcher)</span>
+              </button>
+            )}
+
+            {onOpenSurpriseModal && (
+              <button
+                onClick={onOpenSurpriseModal}
+                className="px-5 py-2.5 rounded-2xl bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 hover:border-amber-500 dark:hover:border-amber-500 font-extrabold text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <Dices className="w-4 h-4 text-amber-500" />
+                <span>Surprise Me! 🎲</span>
+              </button>
+            )}
+
+            {onOpenCompareModal && (
+              <button
+                onClick={onOpenCompareModal}
+                className="px-5 py-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-extrabold text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <Swords className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span>Compare Apps (Versus Mode) ⚔️</span>
+              </button>
+            )}
+          </div>
+
+          {/* Main Search Bar & Suggestions Container */}
+          <div ref={searchContainerRef} className="mt-6 max-w-2xl mx-auto relative z-30">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 rounded-2xl blur-md opacity-25 group-hover:opacity-40 transition duration-300" />
               
-              {/* Header section when typing query */}
-              <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-                <span className="flex items-center gap-1.5 font-bold text-blue-600 dark:text-blue-400">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  {searchQuery ? `Google Live Suggestions for "${searchQuery}"` : 'Popular Quick Suggestions'}
-                </span>
-                <span className="text-[11px] text-slate-400">10 Live Suggestions</span>
-              </div>
-
-              <div className="max-h-[420px] overflow-y-auto p-2 space-y-1">
+              <div className="relative flex items-center bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-2 sm:p-2.5">
+                <Search className="w-6 h-6 text-slate-400 dark:text-slate-500 ml-3 shrink-0" />
                 
-                {/* 1. Google Live Suggestions (10 items) */}
-                {googleSuggestions.length > 0 && (
-                  <div className="mb-2 space-y-0.5">
-                    <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                      <Search className="w-3 h-3 text-blue-500" /> 10 Suggestions from Google
-                    </div>
-                    {googleSuggestions.map((gItem, idx) => {
-                      const itemIndex = idx;
-                      const isSelected = selectedIndex === itemIndex;
-                      return (
-                        <div
-                          key={`g-${idx}`}
-                          onClick={() => handleSelectItem({ type: 'google', data: gItem })}
-                          className={`flex items-center justify-between px-3.5 py-2 rounded-xl cursor-pointer transition-all ${
-                            isSelected
-                              ? 'bg-blue-600 text-white font-bold shadow-md'
-                              : 'text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-800/80 font-medium'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 text-sm min-w-0">
-                            <Search className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
-                            <span className="truncate">{gItem}</span>
-                          </div>
-                          <ArrowRight className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-slate-300 dark:text-slate-600'}`} />
-                        </div>
-                      );
-                    })}
-                  </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onFocus={() => setIsOpen(true)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsOpen(true);
+                    setSelectedIndex(-1);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Search any app name (e.g. VS Code, Blender, VLC, Brave)..."
+                  className="w-full pl-3 pr-4 py-2 sm:py-2.5 text-base sm:text-lg bg-transparent text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
+                  autoFocus
+                />
+
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setIsOpen(false);
+                    }}
+                    className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 mr-1 cursor-pointer"
+                    title="Clear search"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 )}
 
-                {/* 2. Matching Apps Suggestions */}
-                {suggestions.apps.length > 0 && (
-                  <div className="mb-2 space-y-0.5">
-                    <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                      <AppWindow className="w-3 h-3 text-indigo-500" /> Matching Apps ({suggestions.apps.length})
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="hidden sm:flex items-center gap-1.5 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-sm rounded-xl shadow-md transition duration-200 shrink-0 cursor-pointer"
+                >
+                  <Search className="w-4 h-4" />
+                  <span>Search</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Interactive Live Search Suggestions Dropdown */}
+            {isOpen && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 text-left animate-in fade-in slide-in-from-top-2 duration-200">
+                
+                {/* Header section when typing query */}
+                <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  <span className="flex items-center gap-1.5 font-bold text-blue-600 dark:text-blue-400">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    {searchQuery ? `Google Live Suggestions for "${searchQuery}"` : 'Popular Quick Suggestions'}
+                  </span>
+                  <span className="text-[11px] text-slate-400">10 Live Suggestions</span>
+                </div>
+
+                <div className="max-h-[420px] overflow-y-auto p-2 space-y-1">
+                  
+                  {/* 1. Google Live Suggestions (10 items) */}
+                  {googleSuggestions.length > 0 && (
+                    <div className="mb-2 space-y-0.5">
+                      <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                        <Search className="w-3 h-3 text-blue-500" /> 10 Suggestions from Google
+                      </div>
+                      {googleSuggestions.map((gItem, idx) => {
+                        const itemIndex = idx;
+                        const isSelected = selectedIndex === itemIndex;
+                        return (
+                          <div
+                            key={`g-${idx}`}
+                            onClick={() => handleSelectItem({ type: 'google', data: gItem })}
+                            className={`flex items-center justify-between px-3.5 py-2 rounded-xl cursor-pointer transition-all ${
+                              isSelected
+                                ? 'bg-blue-600 text-white font-bold shadow-md'
+                                : 'text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-800/80 font-medium'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 text-sm min-w-0">
+                              <Search className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
+                              <span className="truncate">{gItem}</span>
+                            </div>
+                            <ArrowRight className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-slate-300 dark:text-slate-600'}`} />
+                          </div>
+                        );
+                      })}
                     </div>
-                    {suggestions.apps.map((app, idx) => {
-                      const itemIndex = googleSuggestions.length + idx;
-                      const isSelected = selectedIndex === itemIndex;
-                      const initials = app.name ? app.name.trim().substring(0, 2).toUpperCase() : 'AP';
+                  )}
 
-                      return (
-                        <div
-                          key={app.id}
-                          onClick={() => handleSelectItem({ type: 'app', data: app })}
-                          className={`flex items-center justify-between px-3.5 py-2 rounded-xl cursor-pointer transition-all ${
-                            isSelected
-                              ? 'bg-blue-600 text-white shadow-md'
-                              : 'hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-900 dark:text-white'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
-                              <img 
-                                src={app.icon || `https://www.google.com/s2/favicons?domain=${getAppDomain(app.name)}&sz=128`} 
-                                alt={app.name} 
-                                className="w-full h-full object-contain p-0.5"
-                                onError={(e) => { 
-                                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=2563eb&color=ffffff&bold=true&size=128`;
-                                }}
-                              />
+                  {/* 2. Matching Apps Suggestions */}
+                  {suggestions.apps.length > 0 && (
+                    <div className="mb-2 space-y-0.5">
+                      <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                        <AppWindow className="w-3 h-3 text-indigo-500" /> Matching Apps ({suggestions.apps.length})
+                      </div>
+                      {suggestions.apps.map((app, idx) => {
+                        const itemIndex = googleSuggestions.length + idx;
+                        const isSelected = selectedIndex === itemIndex;
+                        const initials = app.name ? app.name.trim().substring(0, 2).toUpperCase() : 'AP';
+
+                        return (
+                          <div
+                            key={app.id}
+                            onClick={() => handleSelectItem({ type: 'app', data: app })}
+                            className={`flex items-center justify-between px-3.5 py-2 rounded-xl cursor-pointer transition-all ${
+                              isSelected
+                                ? 'bg-blue-600 text-white shadow-md'
+                                : 'hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-900 dark:text-white'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
+                                <img 
+                                  src={app.icon || `https://www.google.com/s2/favicons?domain=${getAppDomain(app.name)}&sz=128`} 
+                                  alt={app.name} 
+                                  className="w-full h-full object-contain p-0.5"
+                                  onError={(e) => { 
+                                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=2563eb&color=ffffff&bold=true&size=128`;
+                                  }}
+                                />
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className={`text-xs sm:text-sm font-bold truncate ${isSelected ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+                                  {app.name}
+                                </h4>
+                                <p className={`text-[11px] truncate ${isSelected ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'}`}>
+                                  {app.categoryName} • {app.licenseType}
+                                </p>
+                              </div>
                             </div>
-                            <div className="min-w-0">
-                              <h4 className={`text-xs sm:text-sm font-bold truncate ${isSelected ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
-                                {app.name}
-                              </h4>
-                              <p className={`text-[11px] truncate ${isSelected ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'}`}>
-                                {app.categoryName} • {app.licenseType}
-                              </p>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'}`}>
+                                {app.platforms[0]}
+                              </span>
+                              <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
                             </div>
                           </div>
-
-                          <div className="flex items-center gap-2 shrink-0">
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'}`}>
-                              {app.platforms[0]}
-                            </span>
-                            <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  )}
 
                 {/* 3. Category Suggestions */}
                 {suggestions.categories.length > 0 && (
@@ -474,5 +521,6 @@ export default function HeroSection({
 
       </div>
     </section>
+  </>
   );
 }

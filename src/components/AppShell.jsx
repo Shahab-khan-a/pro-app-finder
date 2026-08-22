@@ -5,6 +5,10 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AppDetailModal from '@/components/AppDetailModal';
 import SubmitAppModal from '@/components/SubmitAppModal';
+import AppQuizModal from '@/components/AppQuizModal';
+import SurpriseMeModal from '@/components/SurpriseMeModal';
+import AppComparisonModal from '@/components/AppComparisonModal';
+import FloatingDiscoveryBadge from '@/components/FloatingDiscoveryBadge';
 
 export default function AppShell({ children, activeTab = 'home' }) {
   const [currentTab, setCurrentTab] = useState(activeTab);
@@ -17,6 +21,9 @@ export default function AppShell({ children, activeTab = 'home' }) {
   // Modal States
   const [selectedApp, setSelectedApp] = useState(null);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+  const [isSurpriseModalOpen, setIsSurpriseModalOpen] = useState(false);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
   // Read localStorage post-hydration to avoid SSR mismatch
   useEffect(() => {
@@ -80,6 +87,9 @@ export default function AppShell({ children, activeTab = 'home' }) {
         toggleFavorite,
         setSelectedApp,
         setIsSubmitModalOpen,
+        setIsQuizModalOpen,
+        setIsSurpriseModalOpen,
+        setIsCompareModalOpen,
         isDarkMode,
         setIsDarkMode
       });
@@ -96,6 +106,8 @@ export default function AppShell({ children, activeTab = 'home' }) {
         setIsDarkMode={setIsDarkMode}
         favoritesCount={favorites.length}
         onOpenSubmitModal={() => setIsSubmitModalOpen(true)}
+        onOpenQuizModal={() => setIsQuizModalOpen(true)}
+        onOpenSurpriseModal={() => setIsSurpriseModalOpen(true)}
       />
 
       <main className="flex-1">
@@ -120,6 +132,30 @@ export default function AppShell({ children, activeTab = 'home' }) {
       <SubmitAppModal
         isOpen={isSubmitModalOpen}
         onClose={() => setIsSubmitModalOpen(false)}
+      />
+
+      <AppQuizModal
+        isOpen={isQuizModalOpen}
+        onClose={() => setIsQuizModalOpen(false)}
+        onSelectApp={(app) => setSelectedApp(app)}
+      />
+
+      <SurpriseMeModal
+        isOpen={isSurpriseModalOpen}
+        onClose={() => setIsSurpriseModalOpen(false)}
+        onSelectApp={(app) => setSelectedApp(app)}
+      />
+
+      <AppComparisonModal
+        isOpen={isCompareModalOpen}
+        onClose={() => setIsCompareModalOpen(false)}
+        onSelectApp={(app) => setSelectedApp(app)}
+      />
+
+      <FloatingDiscoveryBadge
+        onOpenQuiz={() => setIsQuizModalOpen(true)}
+        onOpenSurprise={() => setIsSurpriseModalOpen(true)}
+        onSelectApp={(app) => setSelectedApp(app)}
       />
     </div>
   );

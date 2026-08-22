@@ -26,6 +26,8 @@ export default function Navbar({
   setIsDarkMode, 
   favoritesCount = 0,
   onOpenSubmitModal,
+  onOpenQuizModal,
+  onOpenSurpriseModal,
   searchQuery,
   setSearchQuery
 }) {
@@ -103,16 +105,37 @@ export default function Navbar({
           </nav>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             
+            {/* AI Matcher Trigger */}
+            {onOpenQuizModal && (
+              <button
+                onClick={onOpenQuizModal}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                <span>AI Matcher</span>
+              </button>
+            )}
+
+            {/* Surprise Me Trigger */}
+            {onOpenSurpriseModal && (
+              <button
+                onClick={onOpenSurpriseModal}
+                className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-all cursor-pointer"
+              >
+                <span>Surprise Me 🎲</span>
+              </button>
+            )}
+
             {/* Submit App CTA */}
             {onOpenSubmitModal && (
               <button
                 onClick={onOpenSubmitModal}
-                className="hidden lg:flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 bg-indigo-50/50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-all duration-200 shadow-xs"
+                className="hidden xl:flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 bg-indigo-50/50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-all duration-200 shadow-xs cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Submit Free App</span>
+                <span>Submit App</span>
               </button>
             )}
 
@@ -178,13 +201,38 @@ export default function Navbar({
                 );
               })}
 
+              {onOpenQuizModal && (
+                <button
+                  onClick={() => {
+                    onOpenQuizModal();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 mt-2 shadow-md"
+                >
+                  <Sparkles className="w-5 h-5 text-amber-300" />
+                  <span>AI Software Matcher</span>
+                </button>
+              )}
+
+              {onOpenSurpriseModal && (
+                <button
+                  onClick={() => {
+                    onOpenSurpriseModal();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60"
+                >
+                  <span>Surprise Me 🎲</span>
+                </button>
+              )}
+
               {onOpenSubmitModal && (
                 <button
                   onClick={() => {
                     onOpenSubmitModal();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 mt-2"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60"
                 >
                   <PlusCircle className="w-5 h-5 text-indigo-500" />
                   <span>Submit Free App</span>
