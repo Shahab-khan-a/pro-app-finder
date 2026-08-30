@@ -1,7 +1,7 @@
 import './globals.css';
 import { APPS_DATA } from '@/data/appsData';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appo-rho.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app-scout-git-main-kms475531-5446s-projects.vercel.app';
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -92,7 +92,7 @@ export const metadata = {
     images: [`${siteUrl}/og-image.png`],
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'W4WuwZJ4td4JVT1Nl6eKPw6hvQzC8Vwx0OtmD57VOKU',
+    google: 'W4WuwZJ4td4JVT1Nl6eKPw6hvQzC8Vwx0OtmD57VOKU',
     yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
     other: {
       'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION || undefined,
@@ -182,6 +182,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Google Site Verification Meta Tags */}
+        <meta name="google-site-verification" content="W4WuwZJ4td4JVT1Nl6eKPw6hvQzC8Vwx0OtmD57VOKU" />
+        <meta name="google-site-verification" content="i9p0jcuKO_11lvYKwmbcOeqjL1ZT8ZC2ZH-lTM-FAzQ" />
+
         {/* Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

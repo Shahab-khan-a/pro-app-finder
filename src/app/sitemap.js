@@ -1,7 +1,7 @@
 import { APPS_DATA, CATEGORIES } from '@/data/appsData';
 
 export default function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appo-rho.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app-scout-git-main-kms475531-5446s-projects.vercel.app';
   const currentDate = new Date().toISOString();
 
   // Static core routes
