@@ -1,4 +1,4 @@
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appscout.io';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appo-rho.vercel.app';
 
 export const metadata = {
   title: 'Browse Free Software by Category | AppScout',

@@ -1,7 +1,7 @@
 import './globals.css';
 import { APPS_DATA } from '@/data/appsData';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appscout.io';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appo-rho.vercel.app';
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -92,7 +92,7 @@ export const metadata = {
     images: [`${siteUrl}/og-image.png`],
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'i9p0jcuKO_11lvYKwmbcOeqjL1ZT8ZC2ZH-lTM-FAzQ',
     yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
     other: {
       'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION || undefined,

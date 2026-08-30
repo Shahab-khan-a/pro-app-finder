@@ -2,7 +2,7 @@
 import https from 'https';
 
 const INDEXNOW_KEY = 'appscout9940268a7f10438c8230b0e5d9';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://appscout.io';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://appo-rho.vercel.app';
 const host = SITE_URL.replace(/^https?:\/\//, '').replace(/\/+$/, '');
 
 console.log(`\n🚀 Starting Search Engine Indexing for: ${SITE_URL} (${host})\n`);

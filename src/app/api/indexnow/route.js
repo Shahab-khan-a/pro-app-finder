@@ -12,7 +12,7 @@ export async function POST(request) {
 }
 
 async function handleIndexNow(request) {
-  const host = request.headers.get('host') || 'appscout.io';
+  const host = request.headers.get('host') || 'appo-rho.vercel.app';
   const protocol = host.includes('localhost') ? 'http' : 'https';
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`;
 

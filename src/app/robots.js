@@ -1,5 +1,5 @@
 export default function robots() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appscout.io';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appo-rho.vercel.app';
 
   return {
     rules: [

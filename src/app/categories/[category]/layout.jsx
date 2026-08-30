@@ -1,6 +1,6 @@
 import { CATEGORIES } from '@/data/appsData';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appscout.io';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appo-rho.vercel.app';
 
 export async function generateStaticParams() {
   return CATEGORIES.filter((c) => c.id !== 'all').map((category) => ({
