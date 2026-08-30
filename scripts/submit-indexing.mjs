@@ -52,11 +52,13 @@ const req = https.request(
     } else {
       console.log('ℹ️ IndexNow response received.');
     }
+    process.exit(0);
   }
 );
 
 req.on('error', (e) => {
   console.error(`❌ IndexNow Error: ${e.message}`);
+  process.exit(1);
 });
 
 req.write(payload);
