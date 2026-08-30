@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "index": "node scripts/submit-indexing.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.0",
