@@ -18,9 +18,13 @@ import {
   Sparkles,
   Layers,
   Globe,
-  HardDrive
+  HardDrive,
+  CheckCircle2,
+  Lock,
+  ArrowRight
 } from 'lucide-react';
 import { APPS_DATA } from '@/data/appsData';
+import { getWorkingMirrors, getPrimaryDownloadInfo } from '@/utils/mirrorEngine';
 
 export default function AppDetailModal({ 
   app, 
@@ -37,18 +41,27 @@ export default function AppDetailModal({
     return app && app.platforms && app.platforms.length > 0 ? app.platforms[0] : 'windows';
   });
 
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const getInitialIcon = () => {
     if (app && app.icon && !app.icon.includes('domain=desctopapp') && !app.icon.includes('domain=nevapp')) {
       return app.icon;
     }
     try {
       const hostname = new URL(app.officialWebsite).hostname;
-      if (hostname.includes('google.com') || hostname.includes('getintopc.com') || hostname.includes('9mod.com')) {
-        return `https://ui-avatars.com/api/?name=${encodeURIComponent(app ? app.name : 'App')}&background=2563eb&color=ffffff&bold=true&size=128`;
+      if (hostname.includes('google.com') || hostname.includes('getintopc.com') || hostname.includes('filecr.com') || hostname.includes('liteapks.com') || hostname.includes('apkmody.com')) {
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(app ? app.name : 'App')}&background=5a5ff2&color=ffffff&bold=true&size=128`;
       }
       return `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
     } catch {
-      return `https://ui-avatars.com/api/?name=${encodeURIComponent(app ? app.name : 'App')}&background=2563eb&color=ffffff&bold=true&size=128`;
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(app ? app.name : 'App')}&background=5a5ff2&color=ffffff&bold=true&size=128`;
     }
   };
 
@@ -58,6 +71,9 @@ export default function AppDetailModal({
   useEffect(() => {
     setImgSrc(getInitialIcon());
     setErrorStage(0);
+    if (app && app.platforms && app.platforms.length > 0 && !app.platforms.includes(activePlatform)) {
+      setActivePlatform(app.platforms[0]);
+    }
   }, [app ? app.id : null]);
 
   if (!app) return null;
@@ -72,10 +88,10 @@ export default function AppDetailModal({
           return;
         }
       } catch {}
-      setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=2563eb&color=ffffff&bold=true&size=128`);
+      setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=5a5ff2&color=ffffff&bold=true&size=128`);
     } else {
       setErrorStage(2);
-      setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=2563eb&color=ffffff&bold=true&size=128`);
+      setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=5a5ff2&color=ffffff&bold=true&size=128`);
     }
   };
 
@@ -100,164 +116,184 @@ export default function AppDetailModal({
     }
   };
 
-  const getPlatformDownloadUrls = (platform) => {
-    const p = platform ? platform.toLowerCase() : 'windows';
-    const name = encodeURIComponent(app.name);
-
-    if (app.mirrorUrl) {
-      return {
-        downloadUrl: app.downloadUrl || app.mirrorUrl,
-        mirrorUrl: app.mirrorUrl,
-        label: app.downloadLabel || (p === 'windows' ? 'Download for Windows (.exe)' : p === 'mac' ? 'Download for macOS (.dmg)' : p === 'android' ? 'Get for Android (APK)' : p === 'ios' ? 'Get for iOS' : 'Free Download')
-      };
-    }
-
-    if (p === 'windows') {
-      return {
-        downloadUrl: app.downloadUrl || `https://getintopc.com/?s=${name}+windows`,
-        mirrorUrl: app.mirrorUrl || `https://getintopc.com/?s=${name}+windows`,
-        label: 'Download for Windows (.exe)'
-      };
-    } else if (p === 'mac') {
-      return {
-        downloadUrl: app.downloadUrl && app.downloadUrl.includes('mac') ? app.downloadUrl : `${app.officialWebsite}#mac`,
-        mirrorUrl: `https://getintopc.com/?s=${name}+mac`,
-        label: 'Download for macOS (.dmg / App Store)'
-      };
-    } else if (p === 'linux') {
-      return {
-        downloadUrl: `${app.officialWebsite}#linux`,
-        mirrorUrl: `https://flathub.org/apps/search?q=${name}`,
-        label: 'Download for Linux (.AppImage / .deb / Flathub)'
-      };
-    } else if (p === 'android') {
-      return {
-        downloadUrl: `https://play.google.com/store/search?q=${name}&c=apps`,
-        mirrorUrl: `https://apkpure.com/search?q=${name}`,
-        label: 'Get for Android (Google Play / APK)'
-      };
-    } else if (p === 'ios') {
-      return {
-        downloadUrl: `https://www.google.com/search?q=${name}+apple+app+store`,
-        mirrorUrl: `https://www.apple.com/app-store/`,
-        label: 'Get for iOS (Apple App Store)'
-      };
-    }
-
-    return {
-      downloadUrl: app.downloadUrl,
-      mirrorUrl: app.mirrorUrl || `https://getintopc.com/?s=${name}`,
-      label: 'Free Download'
-    };
-  };
-
-  const platformUrls = getPlatformDownloadUrls(activePlatform);
+  const platformInfo = getPrimaryDownloadInfo(app, activePlatform);
+  const verifiedMirrors = getWorkingMirrors(app.name, activePlatform, app.officialWebsite, app.category);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 overflow-y-auto bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto modal-backdrop animate-fade-in"
+      onClick={onClose}
+    >
       
-      {/* Modal Container */}
+      {/* ── Modal Container ── */}
       <div 
-        className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto max-h-[90vh] flex flex-col"
+        className="relative w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden my-auto max-h-[90vh] flex flex-col animate-scale-in"
+        style={{
+          background: 'var(--bg-glass-card)',
+          border: '1px solid rgba(90,95,242,0.25)',
+          boxShadow: '0 24px 60px rgba(0,0,0,0.4), 0 0 32px rgba(90,95,242,0.20)',
+          backdropFilter: 'blur(24px)',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         
-        {/* Top Header Bar */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
-          
+        {/* ── Top Header Bar ── */}
+        <div 
+          className="flex items-center justify-between p-4 sm:p-6 shrink-0"
+          style={{
+            background: 'rgba(90,95,242,0.05)',
+            borderBottom: '1px solid rgba(90,95,242,0.12)',
+          }}
+        >
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+            <span 
+              className="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full"
+              style={{
+                background: 'rgba(90,95,242,0.10)',
+                color: 'var(--accent-primary)',
+                border: '1px solid rgba(90,95,242,0.22)',
+              }}
+            >
               {app.categoryName || 'App Details'}
             </span>
-            <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span>Verified Direct Links</span>
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-400 font-bold">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Verified Direct & Working Mirrors</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Copy link button */}
             <button
               onClick={handleCopyLink}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-              title="Copy official link"
+              className="p-2.5 rounded-xl transition-all cursor-pointer relative"
+              style={{
+                background: copiedLink ? 'rgba(52,211,153,0.15)' : 'rgba(90,95,242,0.08)',
+                border: '1px solid rgba(90,95,242,0.15)',
+                color: copiedLink ? '#34d399' : 'var(--text-secondary)',
+              }}
+              title="Copy official website link"
             >
-              {copiedLink ? <Check className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5" />}
+              {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
             </button>
 
+            {/* Bookmark button */}
             {onToggleFavorite && (
               <button
                 onClick={() => onToggleFavorite(app.id)}
-                className={`p-2 rounded-xl transition-all ${
-                  isFavorite
-                    ? 'bg-amber-500/10 text-amber-500'
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
-                }`}
-                title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                className="p-2.5 rounded-xl transition-all cursor-pointer"
+                style={{
+                  background: isFavorite ? 'rgba(245,158,11,0.15)' : 'rgba(90,95,242,0.08)',
+                  border: isFavorite ? '1px solid rgba(245,158,11,0.30)' : '1px solid rgba(90,95,242,0.15)',
+                  color: isFavorite ? '#fbbf24' : 'var(--text-secondary)',
+                }}
+                title={isFavorite ? "Remove from bookmarks" : "Save to bookmarks"}
               >
-                <Bookmark className={`w-5 h-5 ${isFavorite ? 'fill-amber-500' : ''}`} />
+                <Bookmark className={`w-4 h-4 ${isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} />
               </button>
             )}
 
+            {/* Close button */}
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+              className="p-2.5 rounded-xl transition-all cursor-pointer"
+              style={{
+                background: 'rgba(90,95,242,0.08)',
+                border: '1px solid rgba(90,95,242,0.15)',
+                color: 'var(--text-secondary)',
+              }}
               aria-label="Close modal"
             >
-              <X className="w-6 h-6" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
         </div>
 
-        {/* Scrollable Content Body */}
+        {/* ── Scrollable Content Body ── */}
         <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
           
           {/* Main App Overview */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b border-slate-200 dark:border-slate-800">
-            
+          <div 
+            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6"
+            style={{ borderBottom: '1px solid rgba(90,95,242,0.10)' }}
+          >
             <div className="flex items-start gap-4">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center p-2 shrink-0 shadow-md">
+              <div 
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center p-2.5 shrink-0 shadow-lg"
+                style={{
+                  background: 'rgba(90,95,242,0.08)',
+                  border: '1px solid rgba(90,95,242,0.18)',
+                  boxShadow: '0 4px 20px rgba(90,95,242,0.15)',
+                }}
+              >
                 <img
                   src={imgSrc}
                   alt={app.name}
                   onError={handleImageError}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain rounded-xl"
                 />
               </div>
 
               <div>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                  {app.name}
-                </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                  By <span className="text-slate-800 dark:text-slate-200 font-semibold">{app.publisher}</span> • Version <span className="font-mono text-slate-700 dark:text-slate-300">{app.latestVersion}</span>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl sm:text-3xl font-black" style={{ color: 'var(--text-primary)' }}>
+                    {app.name}
+                  </h2>
+                  <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" title="Verified Safe" />
+                </div>
+
+                <p className="text-xs sm:text-sm font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>
+                  Publisher: <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{app.publisher}</span> • Version <span className="font-mono">{app.latestVersion}</span>
                 </p>
 
                 <div className="flex items-center gap-3 mt-3 flex-wrap">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold border border-amber-500/20">
+                  <div 
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold"
+                    style={{
+                      background: 'rgba(251,191,36,0.10)',
+                      border: '1px solid rgba(251,191,36,0.22)',
+                      color: '#fbbf24',
+                    }}
+                  >
                     <Star className="w-3.5 h-3.5 fill-amber-400" />
                     <span>{app.rating} / 5.0</span>
-                    <span className="text-slate-400 font-normal">({app.reviewCount ? app.reviewCount.toLocaleString() : 0} reviews)</span>
+                    <span style={{ color: 'var(--text-muted)' }}>({app.reviewCount ? (app.reviewCount / 1000).toFixed(1) : 0}k reviews)</span>
                   </div>
 
-                  <span className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-500/20">
+                  <span 
+                    className="px-3 py-1 rounded-xl text-xs font-bold"
+                    style={{
+                      background: 'rgba(90,95,242,0.10)',
+                      color: 'var(--accent-primary)',
+                      border: '1px solid rgba(90,95,242,0.20)',
+                    }}
+                  >
                     {app.licenseType}
                   </span>
 
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    {app.downloadsCount} total downloads
+                  <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+                    {app.downloadsCount} downloads
                   </span>
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* Platform Selector Bar */}
-          <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-            <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-              <span>Select Platform for Download:</span>
-              <span className="text-blue-600 dark:text-blue-400 font-bold capitalize">Selected: {activePlatform}</span>
+          <div 
+            className="p-4 rounded-2xl"
+            style={{
+              background: 'rgba(90,95,242,0.05)',
+              border: '1px solid rgba(90,95,242,0.14)',
+            }}
+          >
+            <h4 
+              className="text-xs font-black uppercase tracking-wider mb-2.5 flex items-center justify-between"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              <span>Select Platform for Download & Mirrors:</span>
+              <span className="capitalize font-black" style={{ color: 'var(--accent-primary)' }}>Selected: {activePlatform}</span>
             </h4>
             
             <div className="flex flex-wrap items-center gap-2">
@@ -270,11 +306,13 @@ export default function AppDetailModal({
                       setActivePlatform(p);
                       if (onSelectPlatform) onSelectPlatform(p);
                     }}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 ${
-                      isSelected
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20'
-                        : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-blue-500'
-                    }`}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer active:scale-95"
+                    style={{
+                      background: isSelected ? 'linear-gradient(135deg, #5a5ff2, #7c3aed)' : 'var(--bg-secondary)',
+                      color: isSelected ? '#ffffff' : 'var(--text-secondary)',
+                      border: `1px solid ${isSelected ? 'transparent' : 'rgba(90,95,242,0.15)'}`,
+                      boxShadow: isSelected ? '0 4px 16px rgba(90,95,242,0.35)' : 'none',
+                    }}
                   >
                     {getPlatformIcon(p)}
                     <span className="capitalize">{p}</span>
@@ -285,78 +323,182 @@ export default function AppDetailModal({
             </div>
           </div>
 
-          {/* DYNAMIC PLATFORM DOWNLOAD LINKS SECTION */}
-          <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-100 to-blue-50/50 dark:from-slate-800/80 dark:to-slate-900 border border-blue-200/80 dark:border-slate-700 space-y-4">
-            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Download Links for <span className="capitalize text-blue-600 dark:text-blue-400">{activePlatform}</span>:
-            </h3>
+          {/* ── Official Download & Working Mirrors Section ── */}
+          <div 
+            className="p-5 sm:p-6 rounded-3xl space-y-5"
+            style={{
+              background: 'rgba(90,95,242,0.04)',
+              border: '1px solid rgba(90,95,242,0.18)',
+            }}
+          >
+            <div 
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3"
+              style={{ borderBottom: '1px solid rgba(90,95,242,0.10)' }}
+            >
+              <div className="flex items-center gap-2">
+                <Download className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+                <h3 className="text-base font-black" style={{ color: 'var(--text-primary)' }}>
+                  Downloads & Working Mirrors for <span className="capitalize" style={{ color: 'var(--accent-primary)' }}>{activePlatform}</span>
+                </h3>
+              </div>
+              <div 
+                className="flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full w-fit"
+                style={{
+                  background: 'rgba(52,211,153,0.10)',
+                  color: '#34d399',
+                  border: '1px solid rgba(52,211,153,0.22)',
+                }}
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>100% Tested Working Official Links</span>
+              </div>
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              
-              {/* LINK 1: Official Site & Vendor Download */}
-              <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-white">Option 1: Official Site</h4>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Direct download from publisher's web server.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <a
-                    href={app.officialWebsite}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center justify-between"
+            {/* Official Vendor Row */}
+            <div 
+              className="p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm"
+              style={{
+                background: 'var(--bg-secondary)',
+                border: '1px solid rgba(90,95,242,0.15)',
+              }}
+            >
+              <div>
+                <div className="flex items-center gap-2">
+                  <Globe className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+                  <h4 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Official Publisher Portal</h4>
+                  <span 
+                    className="text-[10px] font-black px-2 py-0.5 rounded-full"
+                    style={{
+                      background: 'rgba(90,95,242,0.10)',
+                      color: 'var(--accent-primary)',
+                      border: '1px solid rgba(90,95,242,0.20)',
+                    }}
                   >
-                    <span>Visit Official Website</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                  <a
-                    href={platformUrls.downloadUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center justify-between shadow-md"
-                  >
-                    <span>{platformUrls.label}</span>
-                    <Download className="w-3.5 h-3.5" />
-                  </a>
+                    Official
+                  </span>
                 </div>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                  Original release directly from developer/publisher website.
+                </p>
               </div>
 
-              {/* LINK 2: Platform Mirror Download */}
-              <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800/80 flex flex-col justify-between space-y-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <HardDrive className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-white">Option 2: {app.mirrorLabel || 'GetIntoPC Pro Mirror'}</h4>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Direct access to {app.mirrorLabel || 'GetIntoPC software mirror'} for {activePlatform}.
-                  </p>
-                </div>
+              <div className="flex items-center gap-2 shrink-0">
                 <a
-                  href={platformUrls.mirrorUrl}
+                  href={app.officialWebsite}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-between shadow-md"
+                  className="px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                  style={{
+                    background: 'rgba(90,95,242,0.06)',
+                    border: '1px solid rgba(90,95,242,0.15)',
+                    color: 'var(--text-secondary)',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-primary)'}
+                  onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
                 >
-                  <span>Open {app.mirrorLabel || 'GetIntoPC Pro Page'}</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Website</span>
+                  <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                </a>
+
+                <a
+                  href={platformInfo.downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 text-white text-xs font-black rounded-xl flex items-center gap-2 shimmer-btn cursor-pointer shadow-md transition-all hover:scale-105 active:scale-95"
+                  style={{ boxShadow: '0 4px 18px rgba(90,95,242,0.40)' }}
+                >
+                  <Download className="w-4 h-4" />
+                  <span>{platformInfo.downloadLabel}</span>
                 </a>
               </div>
-
             </div>
+
+            {/* Verified Working Mirrors Engine Grid */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 
+                  className="text-xs font-black uppercase tracking-wider flex items-center gap-1.5"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <HardDrive className="w-4 h-4 text-indigo-400" />
+                  <span>Alternative Verified Mirrors & Pro Repos:</span>
+                </h4>
+                <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Click any mirror to open</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {verifiedMirrors.map((mirror) => (
+                  <a
+                    key={mirror.id}
+                    href={mirror.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-4 rounded-2xl transition-all hover:scale-[1.01] flex flex-col justify-between group"
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid rgba(90,95,242,0.14)',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = 'rgba(90,95,242,0.35)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(90,95,242,0.15)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = 'rgba(90,95,242,0.14)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span 
+                            className="font-bold text-xs sm:text-sm group-hover:text-indigo-400 transition-colors"
+                            style={{ color: 'var(--text-primary)' }}
+                          >
+                            {mirror.name}
+                          </span>
+                          <span 
+                            className="text-[10px] font-black px-2 py-0.5 rounded-full"
+                            style={{
+                              background: 'rgba(52,211,153,0.10)',
+                              color: '#34d399',
+                              border: '1px solid rgba(52,211,153,0.22)',
+                            }}
+                          >
+                            {mirror.badge}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>
+                          {mirror.tag}
+                        </span>
+                      </div>
+                      <p className="text-[11px] mt-1.5 line-clamp-1" style={{ color: 'var(--text-secondary)' }}>
+                        {mirror.description}
+                      </p>
+                    </div>
+
+                    <div 
+                      className="mt-3.5 pt-2.5 flex items-center justify-between text-xs font-bold"
+                      style={{
+                        borderTop: '1px solid rgba(90,95,242,0.08)',
+                        color: 'var(--accent-primary)',
+                      }}
+                    >
+                      <span>Open mirror link</span>
+                      <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+
           </div>
 
           {/* Description */}
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">
+            <h3 className="text-base font-black mb-2" style={{ color: 'var(--text-primary)' }}>
               About {app.name}
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
               {app.description}
             </p>
           </div>
@@ -364,19 +506,29 @@ export default function AppDetailModal({
           {/* Key Features Grid */}
           {app.features && app.features.length > 0 && (
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-indigo-500" /> Key Features & Capabilities
+              <h3 className="text-base font-black mb-3 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                <Sparkles className="w-4 h-4 text-amber-400" /> Key Features & Capabilities
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {app.features.map((feature, idx) => (
                   <div 
                     key={idx}
-                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-start gap-2.5"
+                    className="p-3 rounded-2xl flex items-start gap-2.5"
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid rgba(90,95,242,0.10)',
+                    }}
                   >
-                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <div 
+                      className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                      style={{
+                        background: 'rgba(52,211,153,0.12)',
+                        color: '#34d399',
+                      }}
+                    >
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </div>
-                    <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                    <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
                       {feature}
                     </span>
                   </div>
@@ -387,20 +539,32 @@ export default function AppDetailModal({
 
           {/* System Requirements & License details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
-              <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
+            <div 
+              className="p-4 rounded-2xl"
+              style={{
+                background: 'var(--bg-secondary)',
+                border: '1px solid rgba(90,95,242,0.12)',
+              }}
+            >
+              <h4 className="text-xs font-black uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>
                 System Requirements
               </h4>
-              <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+              <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
                 {app.systemRequirements || 'Standard modern OS'}
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
-              <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
+            <div 
+              className="p-4 rounded-2xl"
+              style={{
+                background: 'var(--bg-secondary)',
+                border: '1px solid rgba(90,95,242,0.12)',
+              }}
+            >
+              <h4 className="text-xs font-black uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>
                 License & Transparency
               </h4>
-              <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+              <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
                 {app.licenseDetails || 'Free software distribution'}
               </p>
             </div>
@@ -408,16 +572,29 @@ export default function AppDetailModal({
 
           {/* Alternative Similar Free Apps */}
           {alternatives.length > 0 && (
-            <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-blue-500" /> Similar Free Alternatives
+            <div 
+              className="pt-4"
+              style={{ borderTop: '1px solid rgba(90,95,242,0.10)' }}
+            >
+              <h3 className="text-sm font-black mb-3 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                <Layers className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} /> Similar Free Alternatives
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {alternatives.map((alt) => (
                   <div
                     key={alt.id}
                     onClick={() => onSelectAlternative ? onSelectAlternative(alt) : null}
-                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 hover:border-blue-500 dark:hover:border-blue-400 transition-all cursor-pointer flex items-center gap-3 group"
+                    className="p-3.5 rounded-2xl transition-all cursor-pointer flex items-center gap-3 group"
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid rgba(90,95,242,0.12)',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = 'rgba(90,95,242,0.35)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = 'rgba(90,95,242,0.12)';
+                    }}
                   >
                     <img
                       src={alt.icon}
@@ -427,16 +604,23 @@ export default function AppDetailModal({
                           const domain = new URL(alt.officialWebsite).hostname;
                           e.target.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
                         } catch {
-                          e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(alt.name)}&background=2563eb&color=ffffff&bold=true`;
+                          e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(alt.name)}&background=5a5ff2&color=ffffff&bold=true`;
                         }
                       }}
-                      className="w-10 h-10 rounded-lg object-contain bg-white dark:bg-slate-900 p-1 border border-slate-200 dark:border-slate-700 shrink-0"
+                      className="w-10 h-10 rounded-xl object-contain p-1 shrink-0"
+                      style={{
+                        background: 'rgba(90,95,242,0.06)',
+                        border: '1px solid rgba(90,95,242,0.12)',
+                      }}
                     />
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      <p 
+                        className="text-xs font-bold truncate group-hover:text-indigo-400 transition-colors"
+                        style={{ color: 'var(--text-primary)' }}
+                      >
                         {alt.name}
                       </p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                      <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
                         {alt.licenseType}
                       </p>
                     </div>
@@ -448,15 +632,29 @@ export default function AppDetailModal({
 
         </div>
 
-        {/* Modal Footer */}
-        <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 shrink-0">
+        {/* ── Modal Footer ── */}
+        <div 
+          className="p-4 sm:p-5 flex items-center justify-between text-xs shrink-0"
+          style={{
+            background: 'rgba(90,95,242,0.04)',
+            borderTop: '1px solid rgba(90,95,242,0.12)',
+            color: 'var(--text-muted)',
+          }}
+        >
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span>Official publisher download & platform-specific software mirror.</span>
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <span>Official publisher download & platform-specific verified mirrors.</span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-bold rounded-xl transition-colors"
+            className="px-5 py-2.5 font-bold rounded-xl transition-all cursor-pointer"
+            style={{
+              background: 'rgba(90,95,242,0.08)',
+              border: '1px solid rgba(90,95,242,0.18)',
+              color: 'var(--text-primary)',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(90,95,242,0.15)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(90,95,242,0.08)'}
           >
             Close
           </button>

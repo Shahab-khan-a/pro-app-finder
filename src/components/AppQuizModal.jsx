@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Sparkles, 
   X, 
@@ -52,6 +52,15 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
   const [selectedPlatform, setSelectedPlatform] = useState('windows');
   const [selectedLicense, setSelectedLicense] = useState('all');
 
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   // Compute matched apps
   const matchedApps = useMemo(() => {
     let pool = APPS_DATA.filter(app => {
@@ -97,51 +106,76 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop animate-fade-in"
+      onClick={onClose}
+    >
+      <div 
+        className="relative w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-scale-in"
+        style={{
+          background: 'var(--bg-glass-card)',
+          border: '1px solid rgba(90,95,242,0.25)',
+          boxShadow: '0 24px 60px rgba(0,0,0,0.4), 0 0 32px rgba(90,95,242,0.20)',
+          backdropFilter: 'blur(24px)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         
-        {/* Top Header */}
-        <div className="px-6 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
-              <Wand2 className="w-5 h-5 text-amber-300" />
+        {/* ── Top Header ── */}
+        <div 
+          className="px-6 py-4 text-white flex items-center justify-between shrink-0 shimmer-btn"
+          style={{
+            boxShadow: '0 4px 18px rgba(90,95,242,0.30)',
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white/15 rounded-xl backdrop-blur-sm">
+              <Wand2 className="w-5 h-5 text-amber-300 animate-bounce-soft" />
             </div>
             <div>
               <h3 className="text-lg font-black tracking-tight flex items-center gap-2">
                 AI Software Finder & Matcher
               </h3>
-              <p className="text-xs text-blue-100/90 font-medium">Answer 3 quick questions to get your tailored software recommendations</p>
+              <p className="text-xs text-white/80 font-medium">Answer 3 quick questions to get tailored recommendations</p>
             </div>
           </div>
 
           <button 
             onClick={onClose}
             className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition cursor-pointer"
+            aria-label="Close quiz"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Step Indicator */}
-        <div className="px-6 py-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-xs font-semibold text-slate-500 shrink-0">
+        {/* ── Step Indicator ── */}
+        <div 
+          className="px-6 py-3 flex items-center justify-between text-xs font-bold shrink-0"
+          style={{
+            background: 'rgba(90,95,242,0.04)',
+            borderBottom: '1px solid rgba(90,95,242,0.10)',
+            color: 'var(--text-muted)',
+          }}
+        >
           <span>{step <= 3 ? `Step ${step} of 3` : 'Your Recommendations'}</span>
           <div className="flex items-center gap-1.5">
             {[1, 2, 3].map(s => (
               <div 
                 key={s} 
                 className={`h-2 rounded-full transition-all duration-300 ${
-                  step === s ? 'w-6 bg-blue-600' : step > s ? 'w-2 bg-emerald-500' : 'w-2 bg-slate-300 dark:bg-slate-700'
+                  step === s ? 'w-6 bg-indigo-500' : step > s ? 'w-2 bg-emerald-400' : 'w-2 bg-slate-300 dark:bg-slate-700'
                 }`}
               />
             ))}
           </div>
         </div>
 
-        {/* Modal Body */}
+        {/* ── Modal Body ── */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
           {step === 1 && (
             <div className="space-y-4">
-              <h4 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <h4 className="text-base font-black flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                 <span>1. What primary task do you want to accomplish?</span>
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -152,18 +186,25 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
                     <button
                       key={g.id}
                       onClick={() => setSelectedGoal(g.id)}
-                      className={`p-4 rounded-2xl border text-left transition-all flex items-start gap-3 cursor-pointer ${
-                        isSelected
-                          ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-600 dark:border-blue-500 shadow-md ring-2 ring-blue-500/20'
-                          : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                      }`}
+                      className="p-4 rounded-2xl border text-left transition-all flex items-start gap-3 cursor-pointer"
+                      style={{
+                        background: isSelected ? 'rgba(90,95,242,0.12)' : 'var(--bg-secondary)',
+                        borderColor: isSelected ? 'rgba(90,95,242,0.60)' : 'rgba(90,95,242,0.12)',
+                        boxShadow: isSelected ? '0 4px 18px rgba(90,95,242,0.22)' : 'none',
+                      }}
                     >
-                      <div className={`p-2.5 rounded-xl ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
+                      <div 
+                        className="p-2.5 rounded-xl shrink-0"
+                        style={{
+                          background: isSelected ? 'linear-gradient(135deg, #5a5ff2, #7c3aed)' : 'rgba(90,95,242,0.08)',
+                          color: isSelected ? '#ffffff' : 'var(--accent-primary)',
+                        }}
+                      >
                         <Icon className="w-5 h-5" />
                       </div>
                       <div>
-                        <div className="font-bold text-sm text-slate-900 dark:text-white">{g.label}</div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{g.desc}</div>
+                        <div className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{g.label}</div>
+                        <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{g.desc}</div>
                       </div>
                     </button>
                   );
@@ -174,7 +215,7 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
 
           {step === 2 && (
             <div className="space-y-4">
-              <h4 className="text-base font-bold text-slate-900 dark:text-white">
+              <h4 className="text-base font-black" style={{ color: 'var(--text-primary)' }}>
                 2. Which operating system / device platform do you use?
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -185,16 +226,23 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
                     <button
                       key={p.id}
                       onClick={() => setSelectedPlatform(p.id)}
-                      className={`p-4 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
-                        isSelected
-                          ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-600 dark:border-blue-500 shadow-md ring-2 ring-blue-500/20'
-                          : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                      }`}
+                      className="p-4 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer"
+                      style={{
+                        background: isSelected ? 'rgba(90,95,242,0.12)' : 'var(--bg-secondary)',
+                        borderColor: isSelected ? 'rgba(90,95,242,0.60)' : 'rgba(90,95,242,0.12)',
+                        boxShadow: isSelected ? '0 4px 18px rgba(90,95,242,0.22)' : 'none',
+                      }}
                     >
-                      <div className={`p-2.5 rounded-xl ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
+                      <div 
+                        className="p-2.5 rounded-xl shrink-0"
+                        style={{
+                          background: isSelected ? 'linear-gradient(135deg, #5a5ff2, #7c3aed)' : 'rgba(90,95,242,0.08)',
+                          color: isSelected ? '#ffffff' : 'var(--accent-primary)',
+                        }}
+                      >
                         <Icon className="w-5 h-5" />
                       </div>
-                      <div className="font-bold text-sm text-slate-900 dark:text-white">{p.label}</div>
+                      <div className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{p.label}</div>
                     </button>
                   );
                 })}
@@ -204,7 +252,7 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
 
           {step === 3 && (
             <div className="space-y-4">
-              <h4 className="text-base font-bold text-slate-900 dark:text-white">
+              <h4 className="text-base font-black" style={{ color: 'var(--text-primary)' }}>
                 3. What type of license or pricing model do you prefer?
               </h4>
               <div className="grid grid-cols-1 gap-3">
@@ -214,14 +262,15 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
                     <button
                       key={l.id}
                       onClick={() => setSelectedLicense(l.id)}
-                      className={`p-4 rounded-2xl border text-left transition-all flex items-center justify-between cursor-pointer ${
-                        isSelected
-                          ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-600 dark:border-blue-500 shadow-md ring-2 ring-blue-500/20'
-                          : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                      }`}
+                      className="p-4 rounded-2xl border text-left transition-all flex items-center justify-between cursor-pointer"
+                      style={{
+                        background: isSelected ? 'rgba(90,95,242,0.12)' : 'var(--bg-secondary)',
+                        borderColor: isSelected ? 'rgba(90,95,242,0.60)' : 'rgba(90,95,242,0.12)',
+                        boxShadow: isSelected ? '0 4px 18px rgba(90,95,242,0.22)' : 'none',
+                      }}
                     >
-                      <div className="font-bold text-sm text-slate-900 dark:text-white">{l.label}</div>
-                      {isSelected && <CheckCircle2 className="w-5 h-5 text-blue-600" />}
+                      <div className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{l.label}</div>
+                      {isSelected && <CheckCircle2 className="w-5 h-5 text-indigo-500" />}
                     </button>
                   );
                 })}
@@ -232,11 +281,18 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
           {step === 4 && (
             <div className="space-y-4">
               <div className="text-center pb-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-extrabold mb-2">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Matches Ready!
+                <span 
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black mb-2"
+                  style={{
+                    background: 'rgba(52,211,153,0.10)',
+                    color: '#34d399',
+                    border: '1px solid rgba(52,211,153,0.25)',
+                  }}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Matches Ready!
                 </span>
-                <h4 className="text-xl font-black text-slate-900 dark:text-white">
-                  Top Recommended Software Apps for You
+                <h4 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>
+                  Top Recommended Software for You
                 </h4>
               </div>
 
@@ -244,13 +300,21 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
                 {matchedApps.map((app) => (
                   <div 
                     key={app.id}
-                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 hover:border-blue-500 dark:hover:border-blue-500 transition shadow-sm hover:shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                    className="p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm"
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid rgba(90,95,242,0.15)',
+                    }}
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <img 
                         src={app.icon} 
                         alt={app.name}
-                        className="w-12 h-12 rounded-2xl object-cover border border-slate-200 dark:border-slate-700 bg-white shrink-0"
+                        className="w-12 h-12 rounded-2xl object-cover p-1 shrink-0"
+                        style={{
+                          background: 'rgba(90,95,242,0.06)',
+                          border: '1px solid rgba(90,95,242,0.12)',
+                        }}
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = 'https://www.google.com/s2/favicons?domain=github.com&sz=128';
@@ -258,25 +322,33 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h5 className="font-extrabold text-base text-slate-900 dark:text-white truncate">{app.name}</h5>
-                          <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[11px] font-black shadow-xs">
+                          <h5 className="font-black text-base truncate" style={{ color: 'var(--text-primary)' }}>{app.name}</h5>
+                          <span 
+                            className="px-2.5 py-0.5 rounded-full text-white text-[11px] font-black shimmer-btn"
+                          >
                             {app.matchScore}% Match
                           </span>
-                          <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[11px] font-bold flex items-center gap-1">
+                          <span 
+                            className="px-2 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1"
+                            style={{
+                              background: 'rgba(251,191,36,0.10)',
+                              color: '#fbbf24',
+                            }}
+                          >
                             <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {app.rating}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 line-clamp-1">{app.tagline}</p>
+                        <p className="text-xs mt-1 line-clamp-1" style={{ color: 'var(--text-secondary)' }}>{app.tagline}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 pt-2 sm:pt-0">
                       <button
                         onClick={() => {
                           onClose();
                           if (onSelectApp) onSelectApp(app);
                         }}
-                        className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
+                        className="flex-1 sm:flex-initial px-5 py-2.5 text-white text-xs font-black rounded-xl shimmer-btn cursor-pointer transition hover:scale-105 active:scale-95"
                       >
                         View Details
                       </button>
@@ -284,8 +356,12 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
                         href={app.officialWebsite || app.downloadUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl transition cursor-pointer"
-                        title="Download / Visit Official Site"
+                        className="p-2.5 rounded-xl transition cursor-pointer"
+                        style={{
+                          background: 'rgba(90,95,242,0.08)',
+                          color: 'var(--text-primary)',
+                        }}
+                        title="Visit Official Site"
                       >
                         <ExternalLink className="w-4 h-4" />
                       </a>
@@ -297,12 +373,22 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
           )}
         </div>
 
-        {/* Footer Actions */}
-        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+        {/* ── Footer Actions ── */}
+        <div 
+          className="px-6 py-4 flex items-center justify-between shrink-0"
+          style={{
+            background: 'rgba(90,95,242,0.04)',
+            borderTop: '1px solid rgba(90,95,242,0.10)',
+          }}
+        >
           {step > 1 && step <= 4 ? (
             <button
               onClick={() => (step === 4 ? resetQuiz() : setStep(prev => prev - 1))}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+              style={{
+                background: 'rgba(90,95,242,0.08)',
+                color: 'var(--text-secondary)',
+              }}
             >
               <RotateCcw className="w-4 h-4" />
               <span>{step === 4 ? 'Retake Quiz' : 'Back'}</span>
@@ -312,7 +398,7 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
           {step < 3 ? (
             <button
               onClick={() => setStep(prev => prev + 1)}
-              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="px-6 py-2.5 rounded-xl text-white text-xs font-black shimmer-btn transition flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95"
             >
               <span>Next Question</span>
               <ArrowRight className="w-4 h-4" />
@@ -320,7 +406,7 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
           ) : step === 3 ? (
             <button
               onClick={() => setStep(4)}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white text-xs font-black shadow-lg hover:shadow-indigo-500/20 transition flex items-center gap-2 cursor-pointer"
+              className="px-6 py-2.5 rounded-xl text-white text-xs font-black shimmer-btn transition flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
               <span>Calculate My Match</span>
@@ -328,7 +414,11 @@ export default function AppQuizModal({ isOpen, onClose, onSelectApp }) {
           ) : (
             <button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-extrabold shadow-md cursor-pointer"
+              className="px-6 py-2.5 rounded-xl text-xs font-black cursor-pointer transition"
+              style={{
+                background: 'rgba(90,95,242,0.10)',
+                color: 'var(--text-primary)',
+              }}
             >
               Close
             </button>

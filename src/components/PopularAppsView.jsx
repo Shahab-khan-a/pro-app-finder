@@ -1,21 +1,28 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TrendingUp, Star, Award, Code, Download } from 'lucide-react';
+import { TrendingUp, Star, Award, Code, Download, Flame } from 'lucide-react';
 import { APPS_DATA } from '@/data/appsData';
 import AppCard from '@/components/AppCard';
 
-export default function PopularAppsView({ 
-  onSelectApp, 
+const TABS = [
+  { id: 'popular', label: 'Most Downloaded', icon: TrendingUp, color: '#818cf8' },
+  { id: 'rated', label: 'Highest Rated', icon: Star, color: '#fbbf24' },
+  { id: 'opensource', label: 'Open Source', icon: Code, color: '#34d399' },
+  { id: 'featured', label: "Editor's Picks", icon: Award, color: '#f472b6' },
+];
+
+export default function PopularAppsView({
+  onSelectApp,
   setSelectedApp,
-  favorites = [], 
+  favorites = [],
   onToggleFavorite,
   toggleFavorite,
   onSelectPlatform
 }) {
   const handleSelectApp = onSelectApp || setSelectedApp;
   const handleToggleFavorite = onToggleFavorite || toggleFavorite;
-  const [tab, setTab] = useState('popular'); // 'popular' | 'rated' | 'opensource' | 'featured'
+  const [tab, setTab] = useState('popular');
 
   let filteredApps = [...APPS_DATA];
 
@@ -29,75 +36,93 @@ export default function PopularAppsView({
     filteredApps = filteredApps.filter(a => a.featured);
   }
 
+  const activeTab = TABS.find(t => t.id === tab);
+
   return (
-    <div className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      {/* Page Title Header */}
-      <div className="text-center max-w-2xl mx-auto mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-bold mb-3 border border-amber-500/20">
-          <TrendingUp className="w-4 h-4 text-amber-500" />
+    <div className="py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      {/* Page Header */}
+      <div className="text-center max-w-2xl mx-auto mb-12">
+        <div
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black mb-5"
+          style={{
+            background: 'rgba(251,191,36,0.1)',
+            border: '1px solid rgba(251,191,36,0.25)',
+            color: '#fbbf24',
+          }}
+        >
+          <Flame className="w-4 h-4" />
           <span>Curated Leaderboard</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
-          Most Popular Free Applications
+        <h2
+          className="text-3xl sm:text-4xl font-black tracking-tight"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          Most Popular{' '}
+          <span className="gradient-text">Free Applications</span>
         </h2>
-        <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400">
+        <p className="mt-4 text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>
           Top-rated community favorites, open-source giants, and essential daily software.
         </p>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-        <button
-          onClick={() => setTab('popular')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            tab === 'popular'
-              ? 'bg-blue-600 text-white shadow-md'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
-          }`}
+      {/* Segmented Tab Bar */}
+      <div className="flex justify-center mb-10">
+        <div
+          className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl"
+          style={{
+            background: 'rgba(99,102,241,0.07)',
+            border: '1px solid rgba(99,102,241,0.15)',
+          }}
         >
-          <TrendingUp className="w-4 h-4" />
-          <span>Most Downloaded</span>
-        </button>
-
-        <button
-          onClick={() => setTab('rated')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            tab === 'rated'
-              ? 'bg-blue-600 text-white shadow-md'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
-          }`}
-        >
-          <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-          <span>Highest Rated</span>
-        </button>
-
-        <button
-          onClick={() => setTab('opensource')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            tab === 'opensource'
-              ? 'bg-blue-600 text-white shadow-md'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
-          }`}
-        >
-          <Code className="w-4 h-4" />
-          <span>Open Source Giants</span>
-        </button>
-
-        <button
-          onClick={() => setTab('featured')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            tab === 'featured'
-              ? 'bg-blue-600 text-white shadow-md'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
-          }`}
-        >
-          <Award className="w-4 h-4 text-purple-400" />
-          <span>Editor's Picks</span>
-        </button>
+          {TABS.map((t) => {
+            const Icon = t.icon;
+            const isActive = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer"
+                style={{
+                  background: isActive
+                    ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+                    : 'transparent',
+                  color: isActive ? 'white' : 'var(--text-secondary)',
+                  boxShadow: isActive ? '0 4px 14px rgba(99,102,241,0.35)' : 'none',
+                  transform: isActive ? 'scale(1.02)' : 'scale(1)',
+                }}
+                onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; e.currentTarget.style.color = 'var(--text-primary)'; } }}
+                onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; } }}
+              >
+                <Icon
+                  className="w-4 h-4"
+                  style={{ color: isActive ? 'white' : t.color }}
+                />
+                <span className="hidden sm:inline">{t.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Grid */}
+      {/* Results Count */}
+      <div className="flex items-center gap-2 mb-6">
+        <span
+          className="text-xs font-black px-3 py-1 rounded-full"
+          style={{
+            background: 'rgba(99,102,241,0.1)',
+            color: '#818cf8',
+            border: '1px solid rgba(99,102,241,0.2)',
+          }}
+        >
+          {filteredApps.length} Apps
+        </span>
+        <span className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>
+          Showing {activeTab?.label}
+        </span>
+      </div>
+
+      {/* App Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredApps.map((app) => (
           <AppCard
@@ -110,7 +135,6 @@ export default function PopularAppsView({
           />
         ))}
       </div>
-
     </div>
   );
 }

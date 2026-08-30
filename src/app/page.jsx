@@ -1,15 +1,48 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import AppShell from '@/components/AppShell';
 import HeroSection from '@/components/HeroSection';
 import AppCard from '@/components/AppCard';
 import AppIconGridCard from '@/components/AppIconGridCard';
 import TrendingLeaderboard from '@/components/TrendingLeaderboard';
-import { APPS_DATA, CATEGORIES, getAppDomain } from '@/data/appsData';
-import { Search, LayoutGrid, Columns3 } from 'lucide-react';
+import { APPS_DATA, CATEGORIES, PLATFORMS, LICENSE_TYPES, getAppDomain } from '@/data/appsData';
+import { 
+  Search, 
+  LayoutGrid, 
+  Columns3, 
+  X, 
+  Filter, 
+  ArrowUp, 
+  Sparkles, 
+  RotateCcw, 
+  CheckSquare, 
+  Globe, 
+  Palette, 
+  Video, 
+  GraduationCap, 
+  ShieldCheck, 
+  Wrench, 
+  Code, 
+  Music,
+  CheckCircle2,
+  Bookmark,
+  ChevronRight,
+  Layers,
+  Wand2,
+  Dices
+} from 'lucide-react';
 
-function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitModalOpen, setIsSubmitModalOpen, setIsQuizModalOpen, setIsSurpriseModalOpen, setIsCompareModalOpen }) {
+function HomePageContent({ 
+  favorites = [], 
+  toggleFavorite, 
+  setSelectedApp, 
+  isSubmitModalOpen, 
+  setIsSubmitModalOpen, 
+  setIsQuizModalOpen, 
+  setIsSurpriseModalOpen, 
+  setIsCompareModalOpen 
+}) {
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -18,15 +51,57 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' (Compact Icon Grid) or 'cards' (Detailed Cards)
 
+  // Floating Back to Top Button
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  // User Feedback Toast
+  const [toastMessage, setToastMessage] = useState(null);
+  const toastTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const triggerToast = (msg) => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToastMessage(msg);
+    toastTimeoutRef.current = setTimeout(() => {
+      setToastMessage(null);
+    }, 2800);
+  };
+
+  const handleToggleFavoriteWithToast = (appId) => {
+    const isFav = favorites.includes(appId);
+    const targetApp = APPS_DATA.find(a => a.id === appId);
+    const appName = targetApp ? targetApp.name : 'App';
+    
+    if (toggleFavorite) toggleFavorite(appId);
+
+    if (isFav) {
+      triggerToast(`Removed "${appName}" from bookmarks`);
+    } else {
+      triggerToast(`✨ Saved "${appName}" to bookmarks`);
+    }
+  };
+
   const handlePlatformSelect = (platformId) => {
     setSelectedPlatform(platformId);
-    window.scrollTo({ top: 350, behavior: 'smooth' });
+    const element = document.getElementById('apps-directory-section');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Helper to normalize search query terms & handle typos/synonyms
   const normalizeQuery = (rawQuery) => {
     let q = rawQuery.toLowerCase().trim();
-    // Common typos & synonyms
     q = q.replace(/\bnev\b/g, 'new');
     q = q.replace(/\bdesctop\b/g, 'desktop');
     q = q.replace(/\bdekstop\b/g, 'desktop');
@@ -96,41 +171,40 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
       const appDomain = getAppDomain(cleanName);
       const domainName = cleanName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-      const isTikTok = query.toLowerCase().includes('tiktok');
       const isModQuery = query.toLowerCase().includes('mod') || query.toLowerCase().includes('apk') || query.toLowerCase().includes('pro');
-      const targetUrl = isTikTok ? 'https://9mod.com/tiktok.html' : isModQuery ? `https://9mod.com/${domainName}.html` : null;
+      const fallbackIcon = `https://www.google.com/s2/favicons?domain=${appDomain}&sz=128`;
 
-      const fallbackIcon = isTikTok 
-        ? 'https://www.google.com/s2/favicons?domain=tiktok.com&sz=128' 
-        : `https://www.google.com/s2/favicons?domain=${appDomain}&sz=128`;
+      const category = selectedCategory !== 'all' ? selectedCategory : 'utilities';
+      const categoryName = selectedCategory !== 'all' ? (CATEGORIES.find(c => c.id === selectedCategory)?.name || 'Utilities') : 'Utilities';
 
       return {
         id: `dynamic-${domainName}`,
         name: cleanName,
-        tagline: isTikTok ? 'Watch & Stream TikTok Live / Free Download' : isModQuery ? `Unlocked Pro Features / 9mod APK Mod Download` : `Free & Safe Download for ${cleanName}`,
-        description: isTikTok 
-          ? 'TikTok Live lets creators broadcast live streams, interact with millions of viewers, and share short videos. Access direct free download mirror via 9mod.'
-          : `${cleanName} is available for download. Find direct official website links and free PC & Android download mirrors for Windows, macOS, Linux, and mobile devices.`,
+        tagline: isModQuery 
+          ? `Unlocked Pro Features / Verified Working Mirrors` 
+          : `Free & Safe Download for ${cleanName}`,
+        description: `${cleanName} is available for download. Find direct official vendor downloads and verified working Pro / Mod mirrors for Windows, macOS, Linux, and Android with zero 404 dead links.`,
         icon: fallbackIcon,
-        category: selectedCategory !== 'all' ? selectedCategory : 'utilities',
-        categoryName: selectedCategory !== 'all' ? (CATEGORIES.find(c => c.id === selectedCategory)?.name || 'Utilities') : 'Utilities',
+        category: category,
+        categoryName: categoryName,
         licenseType: selectedLicense !== 'all' ? selectedLicense : '100% Free',
-        licenseDetails: isModQuery ? 'Unlocked Pro / APK Mod Mirror' : 'Free Software / Official Distribution',
-        platforms: ['android', 'windows', 'mac', 'linux', 'ios'],
-        officialWebsite: isTikTok ? 'https://www.tiktok.com/' : `https://${appDomain}`,
-        downloadUrl: targetUrl || `https://www.google.com/search?q=${encodeURIComponent(cleanName + ' official download page')}`,
-        mirrorUrl: targetUrl || `https://getintopc.com/?s=${encodeURIComponent(cleanName)}`,
-        mirrorLabel: isTikTok ? '9mod Mirror' : isModQuery ? '9mod APK Mod' : undefined,
-        rating: 4.9,
-        reviewCount: 95000,
-        downloadsCount: '500M+',
+        licenseDetails: isModQuery ? 'Unlocked Pro / Multi-Mirror' : 'Free Software / Official Distribution',
+        platforms: ['windows', 'android', 'mac', 'linux', 'ios'],
+        officialWebsite: `https://${appDomain}`,
+        downloadUrl: `https://liteapks.com/?s=${encodeURIComponent(cleanName)}`,
+        mirrorUrl: `https://filecr.com/search/?q=${encodeURIComponent(cleanName)}`,
+        mirrorLabel: 'FileCR Pro',
+        rating: 4.8,
+        reviewCount: 45000,
+        downloadsCount: '100M+',
         popular: true,
         featured: true,
-        publisher: isTikTok ? '9mod / ByteDance' : isModQuery ? '9mod APK Mod' : `${cleanName} Publisher`,
+        publisher: `${cleanName} Publisher`,
         latestVersion: 'Latest Version',
         features: [
-          isTikTok ? 'Direct free download link on 9mod (https://9mod.com/tiktok.html)' : `Direct official ${cleanName} download portal link`,
-          targetUrl ? `Free APK Mod mirror on 9mod (${targetUrl})` : `Free PC software mirror on GetIntoPC`,
+          `Direct official ${cleanName} download portal link`,
+          `Verified LiteAPKs & APKMody Android Pro search mirrors`,
+          `Verified FileCR & GetIntoPC Windows / Mac Pro mirrors`,
           'Verified malware-free and zero adware policy',
           'Compatible with Windows, macOS, Linux, Android, iOS'
         ],
@@ -139,6 +213,32 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
     }
     return null;
   }, [searchQuery, filteredApps, selectedCategory, selectedLicense]);
+
+  // Check if any filter is actively applied
+  const hasActiveFilters = searchQuery !== '' || selectedCategory !== 'all' || selectedPlatform !== 'all' || selectedLicense !== 'all';
+
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('all');
+    setSelectedPlatform('all');
+    setSelectedLicense('all');
+    triggerToast('All filters have been reset');
+  };
+
+  const getCategoryIconComponent = (iconName) => {
+    switch (iconName) {
+      case 'CheckSquare': return CheckSquare;
+      case 'Globe': return Globe;
+      case 'Palette': return Palette;
+      case 'Video': return Video;
+      case 'GraduationCap': return GraduationCap;
+      case 'ShieldCheck': return ShieldCheck;
+      case 'Wrench': return Wrench;
+      case 'Code': return Code;
+      case 'Music': return Music;
+      default: return Layers;
+    }
+  };
 
   return (
     <>
@@ -159,46 +259,162 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
 
       <TrendingLeaderboard onSelectApp={setSelectedApp} />
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <section id="apps-directory-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* Category Pills Bar */}
-        <div className="relative mb-8">
-          <div className="flex items-center gap-2 overflow-x-auto py-2 px-1 pr-10 scroll-smooth border-b border-slate-200/40 dark:border-slate-800/40 pb-3">
+        {/* ── Category Pills Bar with Icons ── */}
+        <div className="relative mb-6">
+          <div className="flex items-center gap-2 overflow-x-auto py-2.5 px-1 pr-10 scroll-smooth pb-3 no-scrollbar" style={{ borderBottom: '1px solid rgba(90,95,242,0.12)' }}>
             {CATEGORIES.map((cat) => {
               const isActive = selectedCategory === cat.id;
+              const IconComponent = getCategoryIconComponent(cat.icon);
+              const count = cat.id === 'all' ? APPS_DATA.length : APPS_DATA.filter(a => a.category === cat.id).length;
+              
               return (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all whitespace-nowrap border shrink-0 cursor-pointer ${
-                    isActive
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20 scale-[1.02]'
-                      : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-200 whitespace-nowrap shrink-0 cursor-pointer active:scale-95 group"
+                  style={{
+                    background: isActive
+                      ? 'linear-gradient(135deg, #5a5ff2, #7c3aed)'
+                      : 'var(--bg-glass-card)',
+                    color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                    border: `1px solid ${isActive ? 'transparent' : 'rgba(90,95,242,0.14)'}`,
+                    boxShadow: isActive ? '0 4px 18px rgba(90,95,242,0.38)' : 'var(--shadow-card)',
+                  }}
+                  onMouseEnter={e => {
+                    if (!isActive) {
+                      e.currentTarget.style.borderColor = 'rgba(90,95,242,0.35)';
+                      e.currentTarget.style.color = 'var(--text-primary)';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!isActive) {
+                      e.currentTarget.style.borderColor = 'rgba(90,95,242,0.14)';
+                      e.currentTarget.style.color = 'var(--text-secondary)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }
+                  }}
                 >
-                  {cat.name}
+                  <IconComponent className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-indigo-400 group-hover:text-indigo-500'}`} />
+                  <span>{cat.name}</span>
+                  <span
+                    className="px-1.5 py-0.5 rounded-full text-[10px] font-black"
+                    style={{
+                      background: isActive ? 'rgba(255,255,255,0.22)' : 'rgba(90,95,242,0.08)',
+                      color: isActive ? '#ffffff' : 'var(--accent-primary)',
+                    }}
+                  >
+                    {count}
+                  </span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Sorting & Filter Summary Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+        {/* ── Active Filters Row (When Any Filter is Active) ── */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap items-center gap-2 mb-6 p-3.5 rounded-2xl frosted-panel animate-slide-up">
+            <span className="text-xs font-black uppercase tracking-wider flex items-center gap-1.5 mr-1" style={{ color: 'var(--text-secondary)' }}>
+              <Filter className="w-3.5 h-3.5 text-indigo-400" />
+              Active Filters:
+            </span>
+
+            {/* Search Query Chip */}
+            {searchQuery && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                <span>Search: "{searchQuery}"</span>
+                <button 
+                  onClick={() => setSearchQuery('')} 
+                  className="hover:scale-125 transition cursor-pointer"
+                  title="Remove search filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {/* Category Chip */}
+            {selectedCategory !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-purple-500/10 text-purple-500 border border-purple-500/20">
+                <span>Category: {CATEGORIES.find(c => c.id === selectedCategory)?.name}</span>
+                <button 
+                  onClick={() => setSelectedCategory('all')} 
+                  className="hover:scale-125 transition cursor-pointer"
+                  title="Remove category filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {/* Platform Chip */}
+            {selectedPlatform !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                <span>Platform: {PLATFORMS.find(p => p.id === selectedPlatform)?.name || selectedPlatform}</span>
+                <button 
+                  onClick={() => setSelectedPlatform('all')} 
+                  className="hover:scale-125 transition cursor-pointer"
+                  title="Remove platform filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {/* License Chip */}
+            {selectedLicense !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                <span>License: {selectedLicense}</span>
+                <button 
+                  onClick={() => setSelectedLicense('all')} 
+                  className="hover:scale-125 transition cursor-pointer"
+                  title="Remove license filter"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {/* Clear All Button */}
+            <button
+              onClick={clearAllFilters}
+              className="ml-auto flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-black text-rose-500 hover:bg-rose-500/10 transition cursor-pointer"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset All</span>
+            </button>
+          </div>
+        )}
+
+        {/* ── Sorting & Filter Summary Header ── */}
+        <div 
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4"
+          style={{ borderBottom: '1px solid rgba(90,95,242,0.12)' }}
+        >
           <div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-black flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
               <span>
                 {selectedCategory === 'all' 
                   ? 'All Free Software & Apps' 
                   : CATEGORIES.find(c => c.id === selectedCategory)?.name}
               </span>
-              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                {filteredApps.length} Apps Found
+              <span 
+                className="text-xs font-black px-2.5 py-0.5 rounded-full"
+                style={{
+                  background: 'rgba(90,95,242,0.10)',
+                  color: 'var(--accent-primary)',
+                  border: '1px solid rgba(90,95,242,0.20)',
+                }}
+              >
+                {filteredApps.length} {filteredApps.length === 1 ? 'App' : 'Apps'}
               </span>
             </h2>
             {searchQuery && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Showing results for "<span className="font-semibold text-blue-600 dark:text-blue-400">{searchQuery}</span>"
+              <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                Showing matching results for "<span className="font-bold" style={{ color: 'var(--accent-primary)' }}>{searchQuery}</span>"
               </p>
             )}
           </div>
@@ -207,14 +423,21 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
           <div className="flex items-center gap-3 self-end sm:self-auto flex-wrap">
             
             {/* View Mode Toggle: Grid vs Cards */}
-            <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <div 
+              className="flex items-center p-1 rounded-xl"
+              style={{
+                background: 'rgba(90,95,242,0.06)',
+                border: '1px solid rgba(90,95,242,0.14)',
+              }}
+            >
               <button
                 onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                style={{
+                  background: viewMode === 'grid' ? 'var(--bg-secondary)' : 'transparent',
+                  color: viewMode === 'grid' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                  boxShadow: viewMode === 'grid' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                }}
                 title="Compact Icon Grid View"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
@@ -223,27 +446,33 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
 
               <button
                 onClick={() => setViewMode('cards')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  viewMode === 'cards'
-                    ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                style={{
+                  background: viewMode === 'cards' ? 'var(--bg-secondary)' : 'transparent',
+                  color: viewMode === 'cards' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                  boxShadow: viewMode === 'cards' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                }}
                 title="Detailed Cards View"
               >
                 <Columns3 className="w-3.5 h-3.5" />
-                <span>Full Cards</span>
+                <span>Detailed Cards</span>
               </button>
             </div>
 
             {/* Sort Dropdown */}
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase hidden sm:inline">
+              <span className="text-xs font-black uppercase tracking-wider hidden sm:inline" style={{ color: 'var(--text-muted)' }}>
                 Sort:
               </span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 focus:outline-none cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl text-xs font-bold focus:outline-none cursor-pointer transition-all"
+                style={{
+                  background: 'rgba(90,95,242,0.06)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid rgba(90,95,242,0.18)',
+                }}
               >
                 <option value="popular">Most Popular</option>
                 <option value="rating">Highest Rated</option>
@@ -253,17 +482,71 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
           </div>
         </div>
 
-        {/* App Cards Grid */}
+        {/* ── App Cards Grid ── */}
         {filteredApps.length > 0 ? (
-          viewMode === 'grid' ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+          searchQuery.trim() !== '' ? (
+            /* Direct Card View when Searching */
+            <div className="space-y-6">
+              {/* Direct Top Match Highlight if searching for a specific app */}
+              {filteredApps.length > 0 && (
+                <div className="p-1 rounded-3xl" style={{ background: 'linear-gradient(135deg, rgba(90,95,242,0.3), rgba(124,58,237,0.25), rgba(6,182,212,0.2))' }}>
+                  <div className="p-4 sm:p-5 rounded-3xl glass-card">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="flex h-2 w-2 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                      </span>
+                      <span className="text-xs font-black uppercase tracking-wider gradient-text">
+                        🎯 Direct Search Result Card
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredApps.slice(0, 3).map((app) => (
+                        <AppCard
+                          key={app.id}
+                          app={app}
+                          onSelectApp={(a) => setSelectedApp(a)}
+                          isFavorite={favorites ? favorites.includes(app.id) : false}
+                          onToggleFavorite={handleToggleFavoriteWithToast}
+                          onSelectPlatform={handlePlatformSelect}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Matches if more than 3 */}
+              {filteredApps.length > 3 && (
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-sm font-black uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                    More Matching Free Apps ({filteredApps.length - 3})
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredApps.slice(3).map((app) => (
+                      <AppCard
+                        key={app.id}
+                        app={app}
+                        onSelectApp={(a) => setSelectedApp(a)}
+                        isFavorite={favorites ? favorites.includes(app.id) : false}
+                        onToggleFavorite={handleToggleFavoriteWithToast}
+                        onSelectPlatform={handlePlatformSelect}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : viewMode === 'grid' ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 sm:gap-4">
               {filteredApps.map((app) => (
                 <AppIconGridCard
                   key={app.id}
                   app={app}
                   onSelectApp={(a) => setSelectedApp(a)}
                   isFavorite={favorites ? favorites.includes(app.id) : false}
-                  onToggleFavorite={toggleFavorite}
+                  onToggleFavorite={handleToggleFavoriteWithToast}
                 />
               ))}
             </div>
@@ -275,7 +558,7 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
                   app={app}
                   onSelectApp={(a) => setSelectedApp(a)}
                   isFavorite={favorites ? favorites.includes(app.id) : false}
-                  onToggleFavorite={toggleFavorite}
+                  onToggleFavorite={handleToggleFavoriteWithToast}
                   onSelectPlatform={handlePlatformSelect}
                 />
               ))}
@@ -283,17 +566,27 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
           )
         ) : dynamicFallbackResult ? (
           <div className="space-y-4">
-            <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center justify-between">
-              <span>Generated Live Search Result for "{searchQuery}"</span>
-              <span>Click card for full details</span>
+            <div 
+              className="p-3.5 rounded-2xl text-xs font-bold flex items-center justify-between"
+              style={{
+                background: 'rgba(90,95,242,0.08)',
+                border: '1px solid rgba(90,95,242,0.22)',
+                color: 'var(--accent-primary)',
+              }}
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                Live Generated Download Hub for "{searchQuery}"
+              </span>
+              <span>Click card for all download mirrors</span>
             </div>
             {viewMode === 'grid' ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 sm:gap-4">
                 <AppIconGridCard
                   app={dynamicFallbackResult}
                   onSelectApp={(a) => setSelectedApp(a)}
                   isFavorite={favorites ? favorites.includes(dynamicFallbackResult.id) : false}
-                  onToggleFavorite={toggleFavorite}
+                  onToggleFavorite={handleToggleFavoriteWithToast}
                 />
               </div>
             ) : (
@@ -302,38 +595,138 @@ function HomePageContent({ favorites, toggleFavorite, setSelectedApp, isSubmitMo
                   app={dynamicFallbackResult}
                   onSelectApp={(a) => setSelectedApp(a)}
                   isFavorite={favorites ? favorites.includes(dynamicFallbackResult.id) : false}
-                  onToggleFavorite={toggleFavorite}
+                  onToggleFavorite={handleToggleFavoriteWithToast}
                   onSelectPlatform={handlePlatformSelect}
                 />
               </div>
             )}
           </div>
         ) : (
-          <div className="text-center py-16 px-4">
-            <div className="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-400">
+          /* ── Helpful Zero Results State ── */
+          <div 
+            className="text-center py-16 px-6 rounded-3xl glass-card max-w-2xl mx-auto"
+            style={{ border: '1px solid rgba(90,95,242,0.15)' }}
+          >
+            <div 
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{
+                background: 'linear-gradient(135deg, rgba(90,95,242,0.12), rgba(124,58,237,0.08))',
+                border: '1px solid rgba(90,95,242,0.20)',
+                color: 'var(--accent-primary)',
+              }}
+            >
               <Search className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+
+            <h3 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>
               No matching free apps found
             </h3>
-            <p className="mt-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              Try adjusting your search terms or clearing platform & category filters.
+            
+            <p className="mt-2 text-sm max-w-md mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              We couldn't find any app matching your active filters. Try clearing your filters or exploring our AI app matcher.
             </p>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('all');
-                setSelectedPlatform('all');
-                setSelectedLicense('all');
-              }}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl"
-            >
-              Reset All Filters
-            </button>
+
+            {/* Action Buttons */}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={clearAllFilters}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs text-white shimmer-btn cursor-pointer transition-all hover:scale-105 active:scale-95"
+                style={{ boxShadow: '0 4px 18px rgba(90,95,242,0.35)' }}
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset All Filters</span>
+              </button>
+
+              {setIsQuizModalOpen && (
+                <button
+                  onClick={() => setIsQuizModalOpen(true)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs cursor-pointer transition-all hover:scale-105"
+                  style={{
+                    background: 'rgba(90,95,242,0.08)',
+                    color: 'var(--accent-primary)',
+                    border: '1px solid rgba(90,95,242,0.20)',
+                  }}
+                >
+                  <Wand2 className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Try AI Matcher</span>
+                </button>
+              )}
+            </div>
+
+            {/* Popular quick categories shortcuts */}
+            <div className="mt-8 pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
+              <p className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
+                Or browse popular workflows:
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {[
+                  { id: 'video-editing', label: '🎬 Video Editing' },
+                  { id: 'development', label: '💻 Coding Tools' },
+                  { id: 'graphic-design', label: '🎨 Design & 3D' },
+                  { id: 'security-privacy', label: '🛡️ Privacy & VPN' },
+                ].map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => {
+                      clearAllFilters();
+                      setSelectedCategory(c.id);
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
+                    style={{
+                      background: 'rgba(90,95,242,0.06)',
+                      color: 'var(--text-secondary)',
+                      border: '1px solid rgba(90,95,242,0.12)',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.color = 'var(--accent-primary)';
+                      e.currentTarget.style.borderColor = 'rgba(90,95,242,0.30)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.color = 'var(--text-secondary)';
+                      e.currentTarget.style.borderColor = 'rgba(90,95,242,0.12)';
+                    }}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
       </section>
+
+      {/* ── Floating User Feedback Toast Notification ── */}
+      {toastMessage && (
+        <div 
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-2xl animate-slide-up text-sm font-bold"
+          style={{
+            background: 'var(--bg-glass-card)',
+            border: '1px solid rgba(90,95,242,0.30)',
+            color: 'var(--text-primary)',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 12px 36px rgba(0,0,0,0.25), 0 0 20px rgba(90,95,242,0.20)',
+          }}
+        >
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* ── Floating Back to Top Button ── */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 left-6 z-40 p-3 rounded-2xl text-white shadow-xl cursor-pointer transition-all hover:scale-110 active:scale-95 shimmer-btn"
+          style={{
+            boxShadow: '0 4px 20px rgba(90,95,242,0.45)',
+          }}
+          title="Scroll Back to Top"
+          aria-label="Back to top"
+        >
+          <ArrowUp className="w-5 h-5 stroke-[2.5]" />
+        </button>
+      )}
     </>
   );
 }

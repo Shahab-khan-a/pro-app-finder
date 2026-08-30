@@ -1,0 +1,17 @@
+{
+  "name": "AppScout - Free Software & Unlocked APKs Directory",
+  "short_name": "AppScout",
+  "description": "Discover and download verified free desktop software, open-source tools, and unlocked mobile APKs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#5a5ff2",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
