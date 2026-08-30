@@ -92,7 +92,7 @@ export const metadata = {
     images: [`${siteUrl}/og-image.png`],
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'i9p0jcuKO_11lvYKwmbcOeqjL1ZT8ZC2ZH-lTM-FAzQ',
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'W4WuwZJ4td4JVT1Nl6eKPw6hvQzC8Vwx0OtmD57VOKU',
     yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
     other: {
       'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION || undefined,
