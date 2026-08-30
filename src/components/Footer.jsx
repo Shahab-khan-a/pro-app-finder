@@ -14,11 +14,15 @@ import {
   Star,
   Download,
   CheckCircle,
-  Sparkles
+  Sparkles,
+  HelpCircle,
+  ChevronDown
 } from 'lucide-react';
 import { CATEGORIES } from '@/data/appsData';
 
 export default function Footer({ setActiveTab, onOpenSubmitModal }) {
+  const [openFaq, setOpenFaq] = React.useState(null);
+
   const handleNav = (tabId) => {
     if (setActiveTab) setActiveTab(tabId);
   };
@@ -36,6 +40,21 @@ export default function Footer({ setActiveTab, onOpenSubmitModal }) {
     { icon: ShieldCheck,  value: '100%',  label: 'Malware Free',    color: '#34d399' },
     { icon: Star,         value: '4.9★',  label: 'Avg Rating',      color: '#fbbf24' },
     { icon: CheckCircle,  value: 'Daily', label: 'Updates',         color: '#22d3ee' },
+  ];
+
+  const globalFaqs = [
+    {
+      q: 'How does AppScout guarantee 100% safe and virus-free downloads?',
+      a: 'Every software mirror indexed on AppScout is sourced directly from official publisher servers, authenticated open-source repositories (GitHub, GitLab), and scanned via multi-engine antivirus checks. We never bundle third-party installers, toolbars, or adware.',
+    },
+    {
+      q: 'Is software on AppScout free for commercial and personal use?',
+      a: 'Most applications indexed are licensed under permissive open-source licenses (MIT, Apache 2.0, GPL) or freemium licenses with robust free tiers. We clearly mark each application’s license type on its detail page.',
+    },
+    {
+      q: 'Which operating systems are supported?',
+      a: 'AppScout indexes software for Windows 11/10 (64-bit & ARM), macOS (Apple Silicon M1/M2/M3 & Intel), Linux distributions (Ubuntu, Fedora, Arch, Debian), Android APKs, and iOS apps.',
+    },
   ];
 
   return (
@@ -92,6 +111,42 @@ export default function Footer({ setActiveTab, onOpenSubmitModal }) {
                   <Icon className="w-5 h-5" style={{ color: s.color }} />
                   <span className="text-xl font-black" style={{ color: s.color }}>{s.value}</span>
                   <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{s.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── SEO FAQ Section ── */}
+      <div className="border-b border-slate-200/10 dark:border-slate-800/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex items-center gap-2 mb-6">
+            <HelpCircle className="w-4 h-4 text-indigo-400" />
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
+              Frequently Asked Questions &amp; Download Safety
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {globalFaqs.map((faq, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div
+                  key={faq.q}
+                  className="p-5 rounded-2xl border border-slate-200/10 dark:border-slate-800/60 bg-slate-900/20 text-xs transition-colors"
+                >
+                  <button
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    className="w-full flex items-center justify-between text-left font-bold text-slate-200 gap-2 cursor-pointer"
+                  >
+                    <span>{faq.q}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-indigo-400 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isOpen && (
+                    <p className="mt-3 text-slate-400 leading-relaxed">
+                      {faq.a}
+                    </p>
+                  )}
                 </div>
               );
             })}

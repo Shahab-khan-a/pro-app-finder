@@ -32,6 +32,14 @@ export default function sitemap() {
     },
   ];
 
+  // Dynamic category hub routes
+  const categoryRoutes = CATEGORIES.filter((c) => c.id !== 'all').map((category) => ({
+    url: `${baseUrl}/categories/${category.id}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly',
+    priority: 0.9,
+  }));
+
   // Dynamic app detail routes
   const appRoutes = APPS_DATA.map((app) => ({
     url: `${baseUrl}/app/${app.id}`,
@@ -40,5 +48,6 @@ export default function sitemap() {
     priority: app.featured || app.popular ? 0.85 : 0.75,
   }));
 
-  return [...staticRoutes, ...appRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...appRoutes];
 }
+

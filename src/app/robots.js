@@ -8,7 +8,14 @@ export default function robots() {
         allow: '/',
         disallow: ['/api/'],
       },
+      {
+        userAgent: ['Googlebot', 'Bingbot', 'Applebot', 'DuckDuckBot', 'Baiduspider', 'YandexBot'],
+        allow: '/',
+        disallow: ['/api/'],
+      },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
   };
 }
+

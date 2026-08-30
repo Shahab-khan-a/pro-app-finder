@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   LayoutGrid,
   CheckSquare,
@@ -68,10 +69,16 @@ export default function CategoriesView({ onSelectCategory }) {
         {categoriesList.map((cat, i) => {
           const appCount = APPS_DATA.filter(a => a.category === cat.id).length;
           return (
-            <div
+            <Link
               key={cat.id}
-              onClick={() => onSelectCategory ? onSelectCategory(cat.id) : null}
-              className="group relative p-6 rounded-3xl glass-card card-hover-glow cursor-pointer flex flex-col justify-between overflow-hidden"
+              href={`/categories/${cat.id}`}
+              onClick={(e) => {
+                if (onSelectCategory) {
+                  e.preventDefault();
+                  onSelectCategory(cat.id);
+                }
+              }}
+              className="group relative p-6 rounded-3xl glass-card card-hover-glow cursor-pointer flex flex-col justify-between overflow-hidden block"
               style={{ animationDelay: `${i * 50}ms` }}
             >
               {/* Subtle corner glow on hover */}
@@ -112,8 +119,6 @@ export default function CategoriesView({ onSelectCategory }) {
                 <h3
                   className="text-xl font-black transition-colors"
                   style={{ color: 'var(--text-primary)' }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#818cf8'}
-                  onMouseLeave={e => e.currentTarget.style.color = 'var(--text-primary)'}
                 >
                   {cat.name}
                 </h3>
@@ -132,7 +137,7 @@ export default function CategoriesView({ onSelectCategory }) {
                 <span>Explore Category</span>
                 <ChevronRight className="w-4 h-4" />
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

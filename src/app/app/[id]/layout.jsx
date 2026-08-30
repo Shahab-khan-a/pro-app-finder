@@ -2,6 +2,12 @@ import { APPS_DATA } from '@/data/appsData';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appscout.io';
 
+export async function generateStaticParams() {
+  return APPS_DATA.map((app) => ({
+    id: app.id,
+  }));
+}
+
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const app = APPS_DATA.find((a) => a.id === resolvedParams.id);
@@ -26,11 +32,14 @@ export async function generateMetadata({ params }) {
       `${app.name} mod apk`,
       `${app.name} download for pc`,
       `${app.name} for ${platformsStr}`,
+      `${app.name} latest version`,
+      `${app.name} open source`,
       app.publisher,
       app.categoryName,
       app.licenseType,
       'verified safe download',
       'no malware software',
+      'free software download',
     ],
     alternates: {
       canonical: `${siteUrl}/app/${app.id}`,
@@ -73,6 +82,7 @@ export default async function AppDetailLayout({ children, params }) {
           '@type': 'Offer',
           price: '0',
           priceCurrency: 'USD',
+          availability: 'https://schema.org/InStock',
         },
         aggregateRating: {
           '@type': 'AggregateRating',
@@ -83,10 +93,71 @@ export default async function AppDetailLayout({ children, params }) {
         },
         description: app.description,
         image: app.icon,
+        downloadUrl: `${siteUrl}/app/${app.id}`,
         publisher: {
           '@type': 'Organization',
           name: app.publisher,
         },
+      }
+    : null;
+
+  const breadcrumbSchema = app
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: siteUrl,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: app.categoryName || 'Software',
+            item: `${siteUrl}/categories/${app.category || 'all'}`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: app.name,
+            item: `${siteUrl}/app/${app.id}`,
+          },
+        ],
+      }
+    : null;
+
+  const faqSchema = app
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: `Is ${app.name} safe and malware-free to download?`,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: `Yes, all mirrors for ${app.name} on AppScout are verified through official publisher domains, open-source repositories, and multi-engine security scans to guarantee zero malware and zero bundled adware.`,
+            },
+          },
+          {
+            '@type': 'Question',
+            name: `What platforms and operating systems does ${app.name} support?`,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: `${app.name} is available on ${app.platforms.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(', ')}.`,
+            },
+          },
+          {
+            '@type': 'Question',
+            name: `Is ${app.name} completely free or open-source?`,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: `${app.name} is distributed under the ${app.licenseType || 'Free'} license model. AppScout indexes direct official links at zero cost to users.`,
+            },
+          },
+        ],
       }
     : null;
 
@@ -96,6 +167,18 @@ export default async function AppDetailLayout({ children, params }) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }}
+        />
+      )}
+      {breadcrumbSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+      )}
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       )}
       {children}

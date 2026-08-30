@@ -92,10 +92,10 @@ export const metadata = {
     images: [`${siteUrl}/og-image.png`],
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'google-site-verification-token',
-    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION,
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
     other: {
-      'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION || '',
+      'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION || undefined,
     },
   },
 };
@@ -148,6 +148,37 @@ export default function RootLayout({ children }) {
     itemListElement: topFeaturedApps,
   };
 
+  const jsonLdFaq = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is AppScout?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AppScout is a verified free and open-source software directory indexing official downloads, desktop tools, and unlocked APKs across Windows, macOS, Linux, Android, and iOS with zero malware and zero ads.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Are all software downloads on AppScout free and safe?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. Every listed application is checked against multi-engine antivirus scanners and links directly to official developer domains, GitHub repositories, and verified mirrors.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How often is software updated on AppScout?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Our indexes are updated daily to track the latest software versions, releases, and changelogs.',
+        },
+      },
+    ],
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -171,6 +202,10 @@ export default function RootLayout({ children }) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdItemList) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
         />
 
         {/* Theme Initializer */}
