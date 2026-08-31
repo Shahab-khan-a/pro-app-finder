@@ -1,53 +1,49 @@
-import { APPS_DATA, CATEGORIES } from '@/data/appsData';
-
 export default function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app-scout-git-main-kms475531-5446s-projects.vercel.app';
-  const currentDate = new Date().toISOString();
+  const baseUrl =
+    'https://app-scout-git-main-kms475531-5446s-projects.vercel.app';
 
-  // Static core routes
-  const staticRoutes = [
+  return [
     {
-      url: baseUrl,
-      lastModified: currentDate,
+      url: `${baseUrl}/`,
+      lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 1.0,
+      priority: 1,
     },
     {
-      url: `${baseUrl}/popular`,
-      lastModified: currentDate,
+      url: `${baseUrl}/categories/audio`,
+      lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/categories`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.9,
+      url: `${baseUrl}/categories/productivity`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
     },
     {
-      url: `${baseUrl}/about`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.7,
+      url: `${baseUrl}/categories/browsers`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/categories/design`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/categories/video-editing`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/categories/education`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
     },
   ];
-
-  // Dynamic category hub routes
-  const categoryRoutes = CATEGORIES.filter((c) => c.id !== 'all').map((category) => ({
-    url: `${baseUrl}/categories/${category.id}`,
-    lastModified: currentDate,
-    changeFrequency: 'weekly',
-    priority: 0.9,
-  }));
-
-  // Dynamic app detail routes
-  const appRoutes = APPS_DATA.map((app) => ({
-    url: `${baseUrl}/app/${app.id}`,
-    lastModified: currentDate,
-    changeFrequency: 'weekly',
-    priority: app.featured || app.popular ? 0.85 : 0.75,
-  }));
-
-  return [...staticRoutes, ...categoryRoutes, ...appRoutes];
 }
-
