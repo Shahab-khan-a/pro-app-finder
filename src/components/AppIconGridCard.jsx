@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Star, ShieldCheck, Bookmark, Download, Monitor, Smartphone, Apple, Terminal, Tablet } from 'lucide-react';
 
 export default function AppIconGridCard({
@@ -123,12 +124,23 @@ export default function AppIconGridCard({
 
         {/* ── App Name & Safety Shield ── */}
         <div className="w-full flex items-center justify-center gap-1 mb-1 px-1">
-          <h3 
-            className="font-bold text-xs sm:text-sm truncate group-hover:text-indigo-400 transition-colors leading-snug"
-            style={{ color: 'var(--text-primary)' }}
+          <Link
+            href={`/app/${app.id}`}
+            onClick={(e) => {
+              if (onSelectApp) {
+                e.preventDefault();
+                onSelectApp(app);
+              }
+            }}
+            className="truncate max-w-[85%]"
           >
-            {app.name}
-          </h3>
+            <h3 
+              className="font-bold text-xs sm:text-sm truncate hover:text-indigo-400 transition-colors leading-snug"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              {app.name}
+            </h3>
+          </Link>
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" title="Verified Safe" />
         </div>
 

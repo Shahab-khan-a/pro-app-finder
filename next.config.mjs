@@ -15,11 +15,29 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/((?!api|favorites).*)',
         headers: [
           {
             key: 'X-Robots-Tag',
             value: 'all, index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+          },
+        ],
+      },
+      {
+        source: '/favorites',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, follow',
+          },
+        ],
+      },
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
           },
         ],
       },
@@ -28,4 +46,3 @@ const nextConfig = {
 };
 
 export default nextConfig;
-

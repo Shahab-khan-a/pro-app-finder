@@ -1,15 +1,14 @@
 import './globals.css';
 import { APPS_DATA } from '@/data/appsData';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app-scout-git-main-kms475531-5446s-projects.vercel.app';
+import { SITE_CONFIG, SITE_URL } from '@/utils/seoConfig';
 
 export const metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'AppScout - Free Pro Apps, Unlocked APKs & Verified Software Downloads',
-    template: '%s | AppScout - Free Software & Unlocked APKs',
+    default: `${SITE_CONFIG.name} - ${SITE_CONFIG.tagline}`,
+    template: `%s | ${SITE_CONFIG.name} - Free Software & Unlocked APKs`,
   },
-  description: 'Download 10,000+ free pro apps, unlocked APKs, open-source software, and verified desktop tools for Windows, macOS, Linux, Android, and iOS. Direct official links, zero malware, zero adware, and 100% verified working mirrors.',
+  description: SITE_CONFIG.description,
   keywords: [
     'free pro apps',
     'unlocked apk download',
@@ -37,9 +36,9 @@ export const metadata = {
     'Filmora Pro free',
     'Lightroom Pro APK',
     'Alight Motion Pro',
-    'Truecaller Gold APK'
+    'Truecaller Gold APK',
   ],
-  authors: [{ name: 'AppScout Team', url: siteUrl }],
+  authors: [{ name: 'AppScout Team', url: SITE_URL }],
   creator: 'AppScout',
   publisher: 'AppScout Open Software Index',
   applicationName: 'AppScout',
@@ -47,13 +46,15 @@ export const metadata = {
   category: 'Software & Technology',
   classification: 'Software Directory, APK Downloader, Open Source Registry',
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
     shortcut: '/favicon.svg',
     apple: '/favicon.svg',
   },
   manifest: '/manifest.json',
   alternates: {
-    canonical: siteUrl,
+    canonical: SITE_URL,
   },
   robots: {
     index: true,
@@ -68,34 +69,34 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: 'AppScout - Free Pro Apps, Unlocked APKs & Verified Software Downloads',
-    description: 'Browse 10,000+ verified free desktop applications, open-source tools, and unlocked mobile APKs with direct official download links.',
-    url: siteUrl,
-    siteName: 'AppScout',
+    title: `${SITE_CONFIG.name} - ${SITE_CONFIG.tagline}`,
+    description: SITE_CONFIG.description,
+    url: SITE_URL,
+    siteName: SITE_CONFIG.name,
     type: 'website',
     locale: 'en_US',
     images: [
       {
-        url: `${siteUrl}/og-image.png`,
+        url: `${SITE_URL}/opengraph-image`,
         width: 1200,
         height: 630,
-        alt: 'AppScout - Verified Free Software & Pro APK Downloads',
+        alt: `${SITE_CONFIG.name} - Verified Free Software & Pro APK Downloads`,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AppScout - Free Pro Apps, Unlocked APKs & Verified Software Downloads',
-    description: 'Discover thousands of open-source tools, free pro software, and unlocked APKs with direct official publisher download links.',
-    creator: '@AppScout',
-    site: '@AppScout',
-    images: [`${siteUrl}/og-image.png`],
+    title: `${SITE_CONFIG.name} - ${SITE_CONFIG.tagline}`,
+    description: SITE_CONFIG.description,
+    creator: SITE_CONFIG.twitterHandle,
+    site: SITE_CONFIG.twitterHandle,
+    images: [`${SITE_URL}/twitter-image`],
   },
   verification: {
-    google: 'W4WuwZJ4td4JVT1Nl6eKPw6hvQzC8Vwx0OtmD57VOKU',
-    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
+    google: SITE_CONFIG.googleVerificationTokens,
+    yandex: SITE_CONFIG.yandexVerificationToken,
     other: {
-      'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION || undefined,
+      'msvalidate.01': SITE_CONFIG.bingVerificationToken,
     },
   },
 };
@@ -106,7 +107,7 @@ export default function RootLayout({ children }) {
     '@type': 'ListItem',
     position: index + 1,
     name: app.name,
-    url: `${siteUrl}/app/${app.id}`,
+    url: `${SITE_URL}/app/${app.id}`,
     description: app.tagline,
     image: app.icon,
   }));
@@ -116,13 +117,13 @@ export default function RootLayout({ children }) {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'AppScout',
-    url: siteUrl,
-    description: 'Free pro apps, unlocked APKs, open-source software, and verified desktop tools directory.',
+    url: SITE_URL,
+    description: SITE_CONFIG.description,
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${siteUrl}/?q={search_term_string}`,
+        urlTemplate: `${SITE_URL}/?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -132,11 +133,11 @@ export default function RootLayout({ children }) {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'AppScout',
-    url: siteUrl,
-    logo: `${siteUrl}/favicon.svg`,
+    url: SITE_URL,
+    logo: `${SITE_URL}/favicon.svg`,
     description: 'Safe and transparent free software directory offering official and verified open source download mirrors.',
     sameAs: [
-      'https://github.com/appscout',
+      'https://github.com/Shahab-khan-a/pro-app-finder',
       'https://twitter.com/AppScout',
     ],
   };
@@ -176,6 +177,14 @@ export default function RootLayout({ children }) {
           text: 'Our indexes are updated daily to track the latest software versions, releases, and changelogs.',
         },
       },
+      {
+        '@type': 'Question',
+        name: 'Where can I find the XML Sitemap for search engines?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `You can access our full search engine sitemap anytime at ${SITE_URL}/sitemap.xml.`,
+        },
+      },
     ],
   };
 
@@ -183,8 +192,12 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Google Site Verification Meta Tags */}
-        <meta name="google-site-verification" content="W4WuwZJ4td4JVT1Nl6eKPw6hvQzC8Vwx0OtmD57VOKU" />
-        <meta name="google-site-verification" content="i9p0jcuKO_11lvYKwmbcOeqjL1ZT8ZC2ZH-lTM-FAzQ" />
+        {SITE_CONFIG.googleVerificationTokens.map((token) => (
+          <meta key={token} name="google-site-verification" content={token} />
+        ))}
+        {SITE_CONFIG.bingVerificationToken && (
+          <meta name="msvalidate.01" content={SITE_CONFIG.bingVerificationToken} />
+        )}
 
         {/* Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -193,6 +206,9 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
+
+        {/* Dynamic Sitemap Link */}
+        <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
 
         {/* JSON-LD Structured Data for Google Sitelinks Search & Rich Cards */}
         <script

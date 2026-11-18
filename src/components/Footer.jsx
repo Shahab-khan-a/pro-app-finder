@@ -33,6 +33,7 @@ export default function Footer({ setActiveTab, onOpenSubmitModal }) {
     { href: '/popular',    tab: 'popular',    label: 'Popular Apps' },
     { href: '/favorites',  tab: 'favorites',  label: 'Saved Bookmarks' },
     { href: '/about',      tab: 'about',      label: 'About & Safety' },
+    { href: '/sitemap',    tab: 'sitemap',    label: 'HTML Site Map' },
   ];
 
   const trustStats = [
@@ -208,6 +209,7 @@ export default function Footer({ setActiveTab, onOpenSubmitModal }) {
                     background: `${color}0f`,
                     border: `1px solid ${color}22`,
                     color: 'var(--text-muted)',
+                    transition: 'all 0.22s cubic-bezier(0.34,1.56,0.64,1)',
                   }}
                   onMouseEnter={e => {
                     e.currentTarget.style.background = `${color}1e`;
@@ -225,12 +227,6 @@ export default function Footer({ setActiveTab, onOpenSubmitModal }) {
                   }}
                   title={label}
                   aria-label={label}
-                  style={{
-                    background: `${color}0f`,
-                    border: `1px solid ${color}22`,
-                    color: 'var(--text-muted)',
-                    transition: 'all 0.22s cubic-bezier(0.34,1.56,0.64,1)',
-                  }}
                 >
                   <Icon className="w-4 h-4" />
                 </button>
@@ -282,7 +278,7 @@ export default function Footer({ setActiveTab, onOpenSubmitModal }) {
               {CATEGORIES.slice(1, 7).map((c) => (
                 <li key={c.id}>
                   <Link
-                    href="/categories"
+                    href={`/categories/${c.id}`}
                     onClick={() => handleNav('categories')}
                     className="flex items-center gap-2 group transition-all duration-200"
                     style={{ color: 'var(--text-secondary)' }}
@@ -375,7 +371,24 @@ export default function Footer({ setActiveTab, onOpenSubmitModal }) {
             color: 'var(--text-muted)',
           }}
         >
-          <p>© {new Date().getFullYear()} AppScout. All rights reserved. Free software directory for Windows, Mac, Linux, Android & iOS.</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <p>© {new Date().getFullYear()} AppScout. All rights reserved. Free software directory for Windows, Mac, Linux, Android & iOS.</p>
+            <span aria-hidden="true">•</span>
+            <Link
+              href="/sitemap"
+              className="hover:text-indigo-400 transition-colors underline font-medium"
+            >
+              HTML Sitemap
+            </Link>
+            <span aria-hidden="true">•</span>
+            <Link
+              href="/sitemap.xml"
+              target="_blank"
+              className="hover:text-indigo-400 transition-colors underline font-medium"
+            >
+              XML Sitemap
+            </Link>
+          </div>
           <p className="flex items-center gap-2 font-medium">
             <span>Built with</span>
             <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500 animate-bounce-soft" />

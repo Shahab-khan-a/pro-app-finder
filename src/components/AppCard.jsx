@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Download,
   ExternalLink,
@@ -161,9 +162,15 @@ export default function AppCard({
           <div className="flex items-start gap-4 min-w-0 flex-1">
 
             {/* ── App Icon ── */}
-            <div
-              onClick={() => onSelectApp ? onSelectApp(app) : null}
-              className="w-[68px] h-[68px] sm:w-[76px] sm:h-[76px] rounded-2xl shrink-0 cursor-pointer overflow-hidden relative"
+            <Link
+              href={`/app/${app.id}`}
+              onClick={(e) => {
+                if (onSelectApp) {
+                  e.preventDefault();
+                  onSelectApp(app);
+                }
+              }}
+              className="w-[68px] h-[68px] sm:w-[76px] sm:h-[76px] rounded-2xl shrink-0 cursor-pointer overflow-hidden relative block"
               style={{
                 background: 'rgba(90,95,242,0.07)',
                 border: '1px solid rgba(90,95,242,0.14)',
@@ -179,22 +186,29 @@ export default function AppCard({
                 e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
                 e.currentTarget.style.boxShadow = '0 4px 20px rgba(90,95,242,0.12), 0 1px 3px rgba(0,0,0,0.06)';
               }}
+              title={`View ${app.name} Details`}
             >
               {renderAppIcon()}
-            </div>
+            </Link>
 
             {/* ── Title & Publisher ── */}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h3
-                  onClick={() => onSelectApp ? onSelectApp(app) : null}
-                  className="font-black text-base sm:text-lg truncate cursor-pointer transition-colors duration-200"
+                <Link
+                  href={`/app/${app.id}`}
+                  onClick={(e) => {
+                    if (onSelectApp) {
+                      e.preventDefault();
+                      onSelectApp(app);
+                    }
+                  }}
+                  className="font-black text-base sm:text-lg truncate cursor-pointer transition-colors duration-200 block"
                   style={{ color: 'var(--text-primary)' }}
                   onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-primary)'}
                   onMouseLeave={e => e.currentTarget.style.color = 'var(--text-primary)'}
                 >
-                  {app.name}
-                </h3>
+                  <h3 className="truncate font-black text-base sm:text-lg">{app.name}</h3>
+                </Link>
                 <ShieldCheck
                   className="w-4 h-4 shrink-0"
                   style={{ color: '#10b981' }}
@@ -341,7 +355,7 @@ export default function AppCard({
           <a
             href={app.officialWebsite}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
             onClick={(e) => e.stopPropagation()}
             className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all"
             style={{
@@ -369,7 +383,7 @@ export default function AppCard({
           <a
             href={platformUrls.mirrorUrl}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
             onClick={(e) => e.stopPropagation()}
             className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all"
             style={{
@@ -397,7 +411,7 @@ export default function AppCard({
         <a
           href={platformUrls.downloadUrl}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer nofollow"
           onClick={(e) => e.stopPropagation()}
           className="flex items-center justify-center gap-2.5 w-full py-3 rounded-xl text-sm font-black text-white transition-all active:scale-95 shimmer-btn group"
           style={{ boxShadow: '0 4px 20px rgba(90,95,242,0.42)' }}

@@ -1,6 +1,5 @@
-import { CATEGORIES } from '@/data/appsData';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app-scout-git-main-kms475531-5446s-projects.vercel.app';
+import { CATEGORIES, APPS_DATA } from '@/data/appsData';
+import { SITE_URL } from '@/utils/seoConfig';
 
 export async function generateStaticParams() {
   return CATEGORIES.filter((c) => c.id !== 'all').map((category) => ({
@@ -34,16 +33,16 @@ export async function generateMetadata({ params }) {
       'malware free downloads',
     ],
     alternates: {
-      canonical: `${siteUrl}/categories/${category.id}`,
+      canonical: `${SITE_URL}/categories/${category.id}`,
     },
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/categories/${category.id}`,
+      url: `${SITE_URL}/categories/${category.id}`,
       type: 'website',
       images: [
         {
-          url: `${siteUrl}/og-image.png`,
+          url: `${SITE_URL}/opengraph-image`,
           width: 1200,
           height: 630,
           alt: `Best Free ${category.name} Software`,
@@ -54,7 +53,7 @@ export async function generateMetadata({ params }) {
       card: 'summary_large_image',
       title,
       description,
-      images: [`${siteUrl}/og-image.png`],
+      images: [`${SITE_URL}/twitter-image`],
     },
   };
 }
@@ -62,6 +61,10 @@ export async function generateMetadata({ params }) {
 export default async function CategoryLayout({ children, params }) {
   const resolvedParams = await params;
   const category = CATEGORIES.find((c) => c.id === resolvedParams.category);
+
+  const categoryApps = category
+    ? APPS_DATA.filter((app) => app.category === category.id)
+    : [];
 
   const breadcrumbSchema = category
     ? {
@@ -72,19 +75,19 @@ export default async function CategoryLayout({ children, params }) {
             '@type': 'ListItem',
             position: 1,
             name: 'Home',
-            item: siteUrl,
+            item: SITE_URL,
           },
           {
             '@type': 'ListItem',
             position: 2,
             name: 'Categories',
-            item: `${siteUrl}/categories`,
+            item: `${SITE_URL}/categories`,
           },
           {
             '@type': 'ListItem',
             position: 3,
             name: category.name,
-            item: `${siteUrl}/categories/${category.id}`,
+            item: `${SITE_URL}/categories/${category.id}`,
           },
         ],
       }
@@ -96,7 +99,19 @@ export default async function CategoryLayout({ children, params }) {
         '@type': 'CollectionPage',
         name: `Best Free ${category.name} Software & Apps`,
         description: `Curated directory of verified open-source and free applications for ${category.name}.`,
-        url: `${siteUrl}/categories/${category.id}`,
+        url: `${SITE_URL}/categories/${category.id}`,
+        mainEntity: {
+          '@type': 'ItemList',
+          numberOfItems: categoryApps.length,
+          itemListElement: categoryApps.map((app, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: app.name,
+            url: `${SITE_URL}/app/${app.id}`,
+            description: app.tagline,
+            image: app.icon,
+          })),
+        },
       }
     : null;
 

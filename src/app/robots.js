@@ -1,12 +1,15 @@
-export default function robots() {
-  const baseUrl =
-    'https://app-scout-git-main-kms475531-5446s-projects.vercel.app';
+import { SITE_URL, SITE_DOMAIN } from '../utils/seoConfig.js';
 
+export default function robots() {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-    },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/api/', '/favorites'],
+      },
+    ],
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_DOMAIN,
   };
 }

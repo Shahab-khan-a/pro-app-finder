@@ -19,7 +19,8 @@ import {
   Rocket,
   Wand2,
   Dices,
-  ChevronRight
+  ChevronRight,
+  Map
 } from 'lucide-react';
 
 export default function Navbar({
@@ -426,6 +427,21 @@ export default function Navbar({
                   <span>Submit Free App</span>
                 </button>
               )}
+
+              <Link
+                href="/sitemap"
+                onClick={() => {
+                  if (setActiveTab) setActiveTab('sitemap');
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 border border-dashed border-slate-200 dark:border-slate-800"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Map className="w-4 h-4 text-indigo-500" />
+                  <span>Browse Web Site Map</span>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+              </Link>
             </div>
           </div>
         </div>

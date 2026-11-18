@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { APPS_DATA, CATEGORIES } from '@/data/appsData';
+import { SITE_URL } from '@/utils/seoConfig';
 
 const INDEXNOW_KEY = 'appscout9940268a7f10438c8230b0e5d9';
 
@@ -14,14 +15,13 @@ export async function POST(request) {
 async function handleIndexNow(request) {
   const host = request.headers.get('host') || 'app-scout-git-main-kms475531-5446s-projects.vercel.app';
   const protocol = host.includes('localhost') ? 'http' : 'https';
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}` || SITE_URL;
 
   const staticUrls = [
     `${baseUrl}/`,
     `${baseUrl}/popular`,
     `${baseUrl}/categories`,
     `${baseUrl}/about`,
-    `${baseUrl}/favorites`,
   ];
 
   const categoryUrls = CATEGORIES.filter((c) => c.id !== 'all').map(

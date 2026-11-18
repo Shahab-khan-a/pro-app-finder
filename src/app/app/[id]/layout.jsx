@@ -1,6 +1,5 @@
 import { APPS_DATA } from '@/data/appsData';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://app-scout-git-main-kms475531-5446s-projects.vercel.app';
+import { SITE_URL } from '@/utils/seoConfig';
 
 export async function generateStaticParams() {
   return APPS_DATA.map((app) => ({
@@ -42,16 +41,16 @@ export async function generateMetadata({ params }) {
       'free software download',
     ],
     alternates: {
-      canonical: `${siteUrl}/app/${app.id}`,
+      canonical: `${SITE_URL}/app/${app.id}`,
     },
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/app/${app.id}`,
+      url: `${SITE_URL}/app/${app.id}`,
       type: 'article',
       images: [
         {
-          url: app.icon || `${siteUrl}/og-image.png`,
+          url: app.icon || `${SITE_URL}/opengraph-image`,
           width: 256,
           height: 256,
           alt: `${app.name} Logo`,
@@ -62,7 +61,7 @@ export async function generateMetadata({ params }) {
       card: 'summary',
       title,
       description,
-      images: [app.icon || `${siteUrl}/og-image.png`],
+      images: [app.icon || `${SITE_URL}/twitter-image`],
     },
   };
 }
@@ -78,6 +77,7 @@ export default async function AppDetailLayout({ children, params }) {
         name: app.name,
         operatingSystem: app.platforms.join(', '),
         applicationCategory: app.categoryName || 'MultimediaApplication',
+        softwareVersion: app.latestVersion || 'Latest',
         offers: {
           '@type': 'Offer',
           price: '0',
@@ -93,7 +93,9 @@ export default async function AppDetailLayout({ children, params }) {
         },
         description: app.description,
         image: app.icon,
-        downloadUrl: `${siteUrl}/app/${app.id}`,
+        downloadUrl: app.downloadUrl || `${SITE_URL}/app/${app.id}`,
+        installUrl: app.downloadUrl || `${SITE_URL}/app/${app.id}`,
+        featureList: app.features ? app.features.join(', ') : undefined,
         publisher: {
           '@type': 'Organization',
           name: app.publisher,
@@ -110,19 +112,25 @@ export default async function AppDetailLayout({ children, params }) {
             '@type': 'ListItem',
             position: 1,
             name: 'Home',
-            item: siteUrl,
+            item: SITE_URL,
           },
           {
             '@type': 'ListItem',
             position: 2,
-            name: app.categoryName || 'Software',
-            item: `${siteUrl}/categories/${app.category || 'all'}`,
+            name: 'Categories',
+            item: `${SITE_URL}/categories`,
           },
           {
             '@type': 'ListItem',
             position: 3,
+            name: app.categoryName || 'Software',
+            item: `${SITE_URL}/categories/${app.category || 'all'}`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 4,
             name: app.name,
-            item: `${siteUrl}/app/${app.id}`,
+            item: `${SITE_URL}/app/${app.id}`,
           },
         ],
       }
